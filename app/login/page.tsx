@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Eye, EyeOff, Mail, Lock, Github, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,44 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const router = useRouter();
+
+  // Optimized immediate mouse tracking for zero lag
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    setMousePosition({
+      x: e.clientX,
+      y: e.clientY
+    });
+  }, []);
+
+  // Calculate dynamic colors based on cursor X position
+  const getDynamicColors = useCallback(() => {
+    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1920;
+    const normalizedX = Math.min(Math.max(mousePosition.x / screenWidth, 0), 1);
+    
+    // Smooth interpolation between blue (left) and purple/violet (right)
+    // Left side: Bright Blue (59, 130, 246)
+    // Right side: Deep Purple/Violet (139, 92, 246) -> (168, 85, 247)
+    const redComponent = Math.round(59 + (168 - 59) * normalizedX);     // 59 to 168
+    const greenComponent = Math.round(130 + (85 - 130) * normalizedX);  // 130 to 85  
+    const blueComponent = Math.round(246 + (247 - 246) * normalizedX);  // 246 to 247
+    
+    // Create layered colors with different intensities
+    return {
+      primary: `rgba(${redComponent}, ${greenComponent}, ${blueComponent}, 0.25)`,
+      secondary: `rgba(${Math.round(redComponent * 0.8)}, ${Math.round(greenComponent * 0.9)}, ${Math.round(blueComponent * 1.0)}, 0.35)`,
+      tertiary: `rgba(${Math.round(redComponent * 1.1)}, ${Math.round(greenComponent * 0.7)}, ${Math.round(blueComponent * 0.95)}, 0.40)`
+    };
+  }, [mousePosition.x]);
+
+  useEffect(() => {
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [handleMouseMove]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,10 +74,67 @@ const Login = () => {
     <div className="min-h-screen relative flex items-center justify-center">
       {/* N8N-like Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Animated gradient blobs */}
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-600/30 to-pink-600/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-blue-600/30 to-cyan-600/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+        {/* Cursor-following gradient - Primary (Large glossy effect) */}
+        <div 
+          className="absolute w-96 h-96 rounded-full blur-3xl pointer-events-none"
+          style={{
+            left: `${mousePosition.x - 192}px`,
+            top: `${mousePosition.y - 192}px`,
+            willChange: 'left, top, background',
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)',
+            background: `radial-gradient(circle, ${getDynamicColors().primary} 0%, ${getDynamicColors().primary.replace('0.25', '0.15')} 40%, ${getDynamicColors().primary.replace('0.25', '0.08')} 70%, transparent 100%)`
+          }}
+        ></div>
+        
+        {/* Cursor-following gradient - Secondary (Medium glossy layer) */}
+        <div 
+          className="absolute w-64 h-64 rounded-full blur-2xl pointer-events-none"
+          style={{
+            left: `${mousePosition.x - 128}px`,
+            top: `${mousePosition.y - 128}px`,
+            willChange: 'left, top, background',
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)',
+            background: `radial-gradient(circle, ${getDynamicColors().secondary} 0%, ${getDynamicColors().secondary.replace('0.35', '0.20')} 50%, transparent 100%)`
+          }}
+        ></div>
+        
+        {/* Cursor-following gradient - Tertiary (Small intense core) */}
+        <div 
+          className="absolute w-32 h-32 rounded-full blur-xl pointer-events-none"
+          style={{
+            left: `${mousePosition.x - 64}px`,
+            top: `${mousePosition.y - 64}px`,
+            willChange: 'left, top, background',
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)',
+            background: `radial-gradient(circle, ${getDynamicColors().tertiary} 0%, ${getDynamicColors().tertiary.replace('0.40', '0.25')} 60%, transparent 100%)`
+          }}
+        ></div>
+
+        
+        {/* Animated gradient blobs - Modern glossy colors */}
+        <div 
+          className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl animate-pulse"
+          style={{
+            background: 'radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, rgba(236, 72, 153, 0.12) 50%, rgba(244, 63, 94, 0.08) 100%)'
+          }}
+        ></div>
+        <div 
+          className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl animate-pulse"
+          style={{
+            background: 'radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, rgba(59, 130, 246, 0.12) 50%, rgba(99, 102, 241, 0.08) 100%)',
+            animationDelay: '2s'
+          }}
+        ></div>
+        <div 
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl animate-pulse"
+          style={{
+            background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(168, 85, 247, 0.10) 40%, rgba(236, 72, 153, 0.06) 80%, transparent 100%)',
+            animationDelay: '4s'
+          }}
+        ></div>
         
         {/* Dot grid pattern */}
         <div 
@@ -61,8 +155,16 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Black overlay for depth */}
-      <div className="absolute inset-0 bg-black/5 dark:bg-black/20"></div>
+      {/* Subtle overlay for depth and glossy effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 dark:from-white/2 dark:via-transparent dark:to-black/25"></div>
+      
+      {/* Glossy highlight overlay */}
+      <div 
+        className="absolute inset-0 opacity-30"
+        style={{
+          background: 'radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%)'
+        }}
+      ></div>
 
       {/* Theme Toggle - Fixed Position */}
       <div className="fixed top-4 right-4 z-50">
