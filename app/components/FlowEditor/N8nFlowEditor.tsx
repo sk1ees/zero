@@ -44,7 +44,7 @@ import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
 
 export const N8nFlowEditor: React.FC = () => {
-  const { addNode } = useAutomationStore();
+  const { addNode, setShowConfigPanel } = useAutomationStore();
   const [draggedItem, setDraggedItem] = useState<NodeData | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false);
@@ -270,6 +270,16 @@ export const N8nFlowEditor: React.FC = () => {
                   className="h-6 px-2 text-xs"
                 >
                   Center
+                </Button>
+                <Separator orientation="vertical" className="h-4" />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowConfigPanel(true)}
+                  className="h-6 px-2 text-xs gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  Add
                 </Button>
               </div>
             </div>

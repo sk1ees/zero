@@ -1,6 +1,6 @@
 import React from 'react';
 import { Settings, X, Plus, Trash2, AlertTriangle, Info } from 'lucide-react';
-import { useAutomationStore } from '../../stores/automationStore';
+import { useAutomationStore, generateNodeId } from '../../stores/automationStore';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -16,18 +16,73 @@ import {
 } from '../ui/select';
 
 export const ConfigPanel: React.FC = () => {
-  const { selectedNode, updateNode, setSelectedNode } = useAutomationStore();
+  const { selectedNode, updateNode, setSelectedNode, showConfigPanel, setShowConfigPanel } = useAutomationStore();
+
+  if (!showConfigPanel) {
+    return null;
+  }
 
   if (!selectedNode) {
     return (
-      <div className="w-64 bg-card border-l border-border p-4 flex flex-col items-center justify-center text-center">
-        <div className="w-8 h-8 bg-muted/50 rounded-full flex items-center justify-center mb-3">
-          <Settings className="w-4 h-4 text-muted-foreground" />
+      <div className="w-64 bg-card border-l border-border flex flex-col">
+        {/* Header */}
+        <div className="p-3 border-b border-border flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Settings className="w-3 h-3 text-primary" />
+            <h2 className="font-semibold text-foreground text-xs">Configuration</h2>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowConfigPanel(false)}
+            className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
+          >
+            <X className="w-2.5 h-2.5" />
+          </Button>
         </div>
-        <h3 className="text-sm font-medium text-foreground mb-2">Configure Node</h3>
-        <p className="text-xs text-muted-foreground">
-          Select a node on the canvas to configure its properties
-        </p>
+
+        {/* Content */}
+        <div className="flex-1 p-4 flex flex-col items-center justify-center text-center">
+          <div className="w-12 h-12 bg-muted/50 rounded-full flex items-center justify-center mb-4">
+            <Settings className="w-6 h-6 text-muted-foreground" />
+          </div>
+          <h3 className="text-sm font-medium text-foreground mb-2">Configure Node</h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Select a node on the canvas to configure its properties
+          </p>
+          <div className="space-y-2 w-full">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full h-8 text-xs"
+                             onClick={() => {
+                 // Add a new node when Add button is clicked
+                 const { addNode } = useAutomationStore.getState();
+                 const newNode = {
+                   id: generateNodeId(),
+                   type: 'automation',
+                   position: { x: 200, y: 200 },
+                   data: {
+                     id: generateNodeId(),
+                     type: 'action' as const,
+                     label: 'New Node',
+                     icon: 'Zap',
+                     config: {
+                       method: 'GET',
+                       url: '',
+                       queryParams: [],
+                       description: ''
+                     }
+                   }
+                 };
+                 addNode(newNode);
+               }}
+            >
+              <Plus className="w-3 h-3 mr-1" />
+              Add New Node
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }

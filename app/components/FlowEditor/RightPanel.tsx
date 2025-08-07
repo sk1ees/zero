@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { NodeData } from '../../stores/automationStore';
+import { NodeData, useAutomationStore } from '../../stores/automationStore';
 import { cn } from '@/lib/utils';
 
 // Compact automation apps with their triggers and actions
@@ -186,6 +186,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedApp, setSelectedApp] = useState<string | null>(null);
+  const { setShowConfigPanel } = useAutomationStore();
 
   const filteredApps = useMemo(() => {
     if (!searchQuery) return Object.keys(automationApps);
@@ -287,7 +288,10 @@ export const RightPanel: React.FC<RightPanelProps> = ({
                     return (
                       <button
                         key={appName}
-                        onClick={() => setSelectedApp(appName)}
+                        onClick={() => {
+                          setSelectedApp(appName);
+                          setShowConfigPanel(false);
+                        }}
                         className={cn(
                           "w-full flex items-center gap-2 p-2 rounded-sm border border-border/20 bg-background/30 hover:bg-accent/10",
                           "cursor-pointer transition-all duration-150 hover:scale-[1.01]",
@@ -312,7 +316,10 @@ export const RightPanel: React.FC<RightPanelProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setSelectedApp(null)}
+                onClick={() => {
+                  setSelectedApp(null);
+                  setShowConfigPanel(true);
+                }}
                 className="w-full justify-start text-xs hover:bg-accent/20 h-6"
               >
                 ← Back

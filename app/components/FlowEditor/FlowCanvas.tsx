@@ -60,16 +60,19 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
     onNodesChange,
     onEdgesChange,
     onConnect,
-    setSelectedNode
+    setSelectedNode,
+    setShowConfigPanel
   } = useAutomationStore();
 
   const handleNodeClick = useCallback((event: React.MouseEvent, node: any) => {
     setSelectedNode(node);
-  }, [setSelectedNode]);
+    setShowConfigPanel(true);
+  }, [setSelectedNode, setShowConfigPanel]);
 
   const handlePaneClick = useCallback(() => {
     setSelectedNode(null);
-  }, [setSelectedNode]);
+    setShowConfigPanel(false);
+  }, [setSelectedNode, setShowConfigPanel]);
 
   const handleConnect = useCallback((connection: Connection) => {
     onConnect(connection);

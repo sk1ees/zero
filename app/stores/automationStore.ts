@@ -20,6 +20,7 @@ export interface FlowState {
   nodes: Node<NodeData>[];
   edges: Edge[];
   selectedNode: Node<NodeData> | null;
+  showConfigPanel: boolean;
   
   // Actions
   setNodes: (nodes: Node<NodeData>[]) => void;
@@ -28,6 +29,7 @@ export interface FlowState {
   updateNode: (nodeId: string, data: Partial<NodeData>) => void;
   removeNode: (nodeId: string) => void;
   setSelectedNode: (node: Node<NodeData> | null) => void;
+  setShowConfigPanel: (show: boolean) => void;
   onNodesChange: (changes: any[]) => void;
   onEdgesChange: (changes: any[]) => void;
   onConnect: (connection: Connection) => void;
@@ -39,6 +41,7 @@ export const useAutomationStore = create<FlowState>((set, get) => ({
   nodes: [],
   edges: [],
   selectedNode: null,
+  showConfigPanel: true,
 
   setNodes: (nodes) => set({ nodes }),
   setEdges: (edges) => set({ edges }),
@@ -71,6 +74,7 @@ export const useAutomationStore = create<FlowState>((set, get) => ({
   },
 
   setSelectedNode: (node) => set({ selectedNode: node }),
+  setShowConfigPanel: (show) => set({ showConfigPanel: show }),
 
   onNodesChange: (changes) => {
     set((state) => {
