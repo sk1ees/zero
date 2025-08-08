@@ -10,16 +10,18 @@ import {
   ConnectionMode,
   Edge,
   Connection,
+  Node,
   ConnectionLineType,
   ReactFlowProvider
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { useAutomationStore } from '../../stores/automationStore';
+import { NodeData, useAutomationStore } from '../../stores/automationStore';
 import { AutomationNode } from './AutomationNode';
 import { ConditionalEdge } from './ConditionalEdge';
 import { useTheme } from '../theme-provider';
 
-const AutomationNodeComponent = (props: any) => <AutomationNode {...props} id={props.id} />;
+type AutomationNodeComponentProps = { id: string; data: NodeData; selected?: boolean } & Record<string, unknown>;
+const AutomationNodeComponent = (props: AutomationNodeComponentProps) => <AutomationNode {...props} id={props.id} />;
 
 const nodeTypes = {
   automation: AutomationNodeComponent,
@@ -67,7 +69,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
     setShowConfigPanel
   } = useAutomationStore();
 
-  const handleNodeClick = useCallback((event: React.MouseEvent, node: any) => {
+  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node<NodeData>) => {
     setSelectedNode(node);
     setShowConfigPanel(true);
   }, [setSelectedNode, setShowConfigPanel]);

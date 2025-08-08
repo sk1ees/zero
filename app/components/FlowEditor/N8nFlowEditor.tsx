@@ -14,11 +14,8 @@ import {
   ChevronRight,
   Home,
   Workflow,
-  Users,
-  Bell,
   Search,
   Plus,
-  ArrowLeft,
   Eye,
   EyeOff
 } from 'lucide-react';

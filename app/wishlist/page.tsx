@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Mail, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { ThemeToggle } from '../components/theme-toggle';
@@ -270,9 +269,7 @@ const Wishlist = () => {
             <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">zero.ai</h1>
             <div className="space-y-2">
              
-              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-             Get early access and exclusive updates.
-              </p>
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto">Get early access and exclusive updates.</p>
             </div>
           </div>
 

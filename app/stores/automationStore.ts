@@ -1,5 +1,15 @@
 import { create } from 'zustand';
-import { Node, Edge, Connection } from '@xyflow/react';
+import { Node, Edge, Connection, NodeChange, EdgeChange } from '@xyflow/react';
+
+export interface NodeConfig {
+  method?: string;
+  url?: string;
+  queryParams?: Array<{ key: string; value: string }>;
+  description?: string;
+  note?: string;
+  hasErrorHandler?: boolean;
+  [key: string]: unknown;
+}
 
 export interface NodeData extends Record<string, unknown> {
   id: string;
@@ -7,13 +17,7 @@ export interface NodeData extends Record<string, unknown> {
   label: string;
   icon: string;
   app?: string; // Add app information
-  config?: {
-    method?: string;
-    url?: string;
-    queryParams?: Array<{ key: string; value: string }>;
-    description?: string;
-    [key: string]: any;
-  };
+  config?: NodeConfig;
 }
 
 export interface FlowState {
@@ -30,8 +34,8 @@ export interface FlowState {
   removeNode: (nodeId: string) => void;
   setSelectedNode: (node: Node<NodeData> | null) => void;
   setShowConfigPanel: (show: boolean) => void;
-  onNodesChange: (changes: any[]) => void;
-  onEdgesChange: (changes: any[]) => void;
+  onNodesChange: (changes: NodeChange[]) => void;
+  onEdgesChange: (changes: EdgeChange[]) => void;
   onConnect: (connection: Connection) => void;
 }
 

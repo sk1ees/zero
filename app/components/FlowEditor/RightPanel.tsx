@@ -19,8 +19,7 @@ import {
   Users,
   Settings,
   BarChart3,
-  Play,
-  GitBranch
+  Play
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';

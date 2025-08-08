@@ -23,7 +23,7 @@ export const AutomationBuilder: React.FC = () => {
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { over, active } = event;
+    const { over } = event;
     
     if (over && over.id === 'flow-canvas' && draggedItem) {
       // Get the canvas element to calculate relative position

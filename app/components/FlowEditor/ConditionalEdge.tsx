@@ -11,7 +11,6 @@ interface ConditionalEdgeProps extends EdgeProps {
 }
 
 export const ConditionalEdge: React.FC<ConditionalEdgeProps> = ({
-  id,
   sourceX,
   sourceY,
   targetX,

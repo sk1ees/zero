@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Handle, Position, Node } from '@xyflow/react';
-import { Mail, Trello, Database, Zap, MoreHorizontal, Play, Edit, Copy, FileText, AlertTriangle, Trash2 } from 'lucide-react';
+import { Handle, Position } from '@xyflow/react';
+import { Mail, Trello, Database, Zap, MoreHorizontal, Play, Edit, Copy, AlertTriangle, Trash2 } from 'lucide-react';
 import { NodeData, useAutomationStore } from '../../stores/automationStore';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';

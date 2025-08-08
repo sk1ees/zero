@@ -1,6 +1,6 @@
 import React from 'react';
 import { Settings, X, Plus, Trash2, AlertTriangle, Info } from 'lucide-react';
-import { useAutomationStore, generateNodeId } from '../../stores/automationStore';
+import { useAutomationStore, generateNodeId, NodeConfig } from '../../stores/automationStore';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -87,9 +87,9 @@ export const ConfigPanel: React.FC = () => {
     );
   }
 
-  const config = selectedNode.data.config || {};
+  const config: NodeConfig = selectedNode.data.config || {};
 
-  const updateConfig = (key: string, value: any) => {
+  const updateConfig = (key: keyof NodeConfig, value: NodeConfig[keyof NodeConfig]) => {
     updateNode(selectedNode.id, {
       config: {
         ...config,
@@ -206,7 +206,7 @@ export const ConfigPanel: React.FC = () => {
             </Button>
           </div>
           
-          {(config.queryParams || []).map((param: any, index: number) => (
+          {(config.queryParams || []).map((param, index: number) => (
             <div key={index} className="flex gap-2 items-center">
               <Input
                 placeholder="key"
