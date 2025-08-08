@@ -28,7 +28,6 @@ import { useAutomationStore, generateNodeId, NodeData } from '../../stores/autom
 import { Node } from '@xyflow/react';
 import { CollapsibleSidebar } from './CollapsibleSidebar';
 import { RightPanel } from './RightPanel';
-import { ConfigPanel } from './ConfigPanel';
 import { FlowCanvas } from './FlowCanvas';
 import { Button } from '../ui/button';
 import { useTheme } from '../theme-provider';
@@ -285,7 +284,7 @@ export const N8nFlowEditor: React.FC = () => {
             </div>
             
             {/* Flow Canvas */}
-            <div className="flex-1 relative">
+            <div className="flex-1 relative" style={{ height: 'calc(100vh - 96px)' }}>
               <FlowCanvas showMiniMap={showMiniMap} />
             </div>
           </div>
@@ -295,9 +294,6 @@ export const N8nFlowEditor: React.FC = () => {
             isCollapsed={isRightPanelCollapsed}
             onToggleCollapse={() => setIsRightPanelCollapsed(!isRightPanelCollapsed)}
           />
-          
-          {/* Right Configuration Panel */}
-          <ConfigPanel />
         </div>
         
         {/* Drag Overlay */}

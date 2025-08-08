@@ -10,12 +10,14 @@ import {
   ConnectionMode,
   Edge,
   Connection,
-  ConnectionLineType
+  ConnectionLineType,
+  ReactFlowProvider
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useAutomationStore } from '../../stores/automationStore';
 import { AutomationNode } from './AutomationNode';
 import { ConditionalEdge } from './ConditionalEdge';
+import { useTheme } from '../theme-provider';
 
 const AutomationNodeComponent = (props: any) => <AutomationNode {...props} id={props.id} />;
 
@@ -53,6 +55,7 @@ interface FlowCanvasProps {
 
 export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) => {
   const { setNodeRef } = useDroppable({ id: 'flow-canvas' });
+  const { theme } = useTheme();
   
   const {
     nodes,
@@ -87,13 +90,14 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
   }));
 
   return (
-    <div className="flex-1 relative bg-background">
+    <div className="flex-1 relative" style={{ height: '100%', minHeight: '500px' }}>
       <div 
         ref={setNodeRef}
         id="flow-canvas"
         className="w-full h-full"
       >
-        <ReactFlow
+        <ReactFlowProvider>
+          <ReactFlow
           nodes={nodes}
           edges={styledEdges}
           onNodesChange={onNodesChange}
@@ -105,7 +109,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
           edgeTypes={edgeTypes}
           connectionMode={ConnectionMode.Loose}
           fitView
-          className="bg-background"
+          className=""
           defaultViewport={{ x: 0, y: 0, zoom: 1 }}
           minZoom={0.5}
           maxZoom={2}
@@ -120,13 +124,13 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
             strokeWidth: 2,
           }}
           connectionLineType={ConnectionLineType.SmoothStep}
+          style={{ background: 'transparent' }}
         >
           <Background 
-            variant={BackgroundVariant.Dots} 
-            gap={30} 
-            size={1.5}
-            color="hsl(var(--muted-foreground) / 0.2)"
-            className="bg-background"
+            variant={BackgroundVariant.Lines}
+            gap={24}
+            size={1}
+            color={theme === 'dark' ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.1)"}
           />
           <Controls 
             className="bg-card border border-border rounded-lg shadow-lg"
@@ -164,6 +168,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
             </Panel>
           )}
         </ReactFlow>
+        </ReactFlowProvider>
       </div>
     </div>
   );
