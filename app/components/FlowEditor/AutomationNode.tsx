@@ -36,18 +36,35 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
   
   const IconComponent = iconMap[data.icon as keyof typeof iconMap] || Zap;
   
-  const getNodeColor = () => {
+  // Wrapper card color (no translucent background to avoid "transparent" look)
+  const getWrapperColor = () => {
     switch (data.type) {
       case 'start':
-        return 'bg-green-500/10 text-green-600 border-green-200 dark:border-green-800';
+        return 'text-green-600 border-green-200 dark:border-green-800';
       case 'trigger':
-        return 'bg-blue-500/10 text-blue-600 border-blue-200 dark:border-blue-800';
+        return 'text-blue-600 border-blue-200 dark:border-blue-800';
       case 'action':
-        return 'bg-purple-500/10 text-purple-600 border-purple-200 dark:border-purple-800';
+        return 'text-purple-600 border-purple-200 dark:border-purple-800';
       case 'condition':
-        return 'bg-orange-500/10 text-orange-600 border-orange-200 dark:border-orange-800';
+        return 'text-orange-600 border-orange-200 dark:border-orange-800';
       default:
-        return 'bg-gray-500/10 text-gray-600 border-gray-200 dark:border-gray-800';
+        return 'text-gray-600 border-gray-200 dark:border-gray-800';
+    }
+  };
+
+  // Icon chip/tile color (soft tinted background for the small icon area)
+  const getIconColor = () => {
+    switch (data.type) {
+      case 'start':
+        return 'bg-green-500/10 text-green-600';
+      case 'trigger':
+        return 'bg-blue-500/10 text-blue-600';
+      case 'action':
+        return 'bg-purple-500/10 text-purple-600';
+      case 'condition':
+        return 'bg-orange-500/10 text-orange-600';
+      default:
+        return 'bg-gray-500/10 text-gray-600';
     }
   };
 
@@ -106,7 +123,8 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
     removeNode(id);
   };
 
-  const colorClass = getNodeColor();
+  const wrapperColorClass = getWrapperColor();
+  const iconColorClass = getIconColor();
   const handleColor = getHandleColor();
   
   return (
@@ -115,7 +133,7 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
         relative bg-card border-2 rounded-xl shadow-lg
         transition-all duration-200 min-w-[220px] max-w-[280px]
         ${selected ? 'ring-2 ring-primary ring-offset-2 shadow-xl' : 'hover:shadow-md'}
-        ${colorClass}
+        ${wrapperColorClass}
       `}>
         {/* Input Handle - Only show for non-start nodes */}
         {data.type !== 'start' && (
@@ -132,7 +150,7 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
             <div className="flex items-center gap-3">
               <div className={`
                 p-2 rounded-lg flex items-center justify-center
-                ${colorClass}
+                ${iconColorClass}
               `}>
                 <IconComponent className="w-4 h-4" />
               </div>
