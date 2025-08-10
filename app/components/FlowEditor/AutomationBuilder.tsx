@@ -24,17 +24,17 @@ export const AutomationBuilder: React.FC = () => {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { over } = event;
-    
+
     if (over && over.id === 'flow-canvas' && draggedItem) {
       // Get the canvas element to calculate relative position
       const canvasElement = document.getElementById('flow-canvas');
       if (canvasElement) {
         const rect = canvasElement.getBoundingClientRect();
-        
+
         // Use the canvas center as default if no mouse position available
         let x = 200; // Default x position
         let y = 200; // Default y position
-        
+
         // Try to get mouse position from the active element if available
         if (event.activatorEvent) {
           const mouseEvent = event.activatorEvent as MouseEvent;
@@ -63,7 +63,7 @@ export const AutomationBuilder: React.FC = () => {
         addNode(newNode);
       }
     }
-    
+
     setDraggedItem(null);
   };
 
@@ -74,11 +74,11 @@ export const AutomationBuilder: React.FC = () => {
     }} onDragEnd={handleDragEnd}>
       <div className="min-h-screen bg-background flex w-full">
         {/* Collapsible Left Sidebar */}
-        <CollapsibleSidebar 
+        <CollapsibleSidebar
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
-        
+
         {/* Main Canvas Area */}
         <div className="flex-1 flex flex-col">
           {/* Top Toolbar */}
@@ -88,7 +88,7 @@ export const AutomationBuilder: React.FC = () => {
               <div className="h-4 w-px bg-border"></div>
               <span className="text-sm text-muted-foreground">Select an app and drag triggers/actions to build your workflow</span>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -111,16 +111,16 @@ export const AutomationBuilder: React.FC = () => {
               </Button>
             </div>
           </div>
-          
+
           {/* Flow Canvas */}
           <div className="flex-1 relative">
             <FlowCanvas />
           </div>
         </div>
-        
+
         {/* Right Configuration Panel */}
         <ConfigPanel />
-        
+
         {/* Drag Overlay */}
         <DragOverlay>
           {draggedItem && <NodeDragItem nodeData={draggedItem} />}
