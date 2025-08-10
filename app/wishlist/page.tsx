@@ -6,12 +6,14 @@ import Link from 'next/link';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { ThemeToggle } from '../components/theme-toggle';
+import { useToast } from '../hooks/use-toast';
 
 const Wishlist = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const { toast } = useToast();
 
   // Optimized immediate mouse tracking for zero lag
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -60,8 +62,18 @@ const Wishlist = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       setIsSubmitted(true);
+      toast({
+        title: 'Successfully joined!',
+        description: 'You\'ll receive updates soon.',
+        variant: 'success'
+      });
     } catch (error) {
       console.error('Error submitting email:', error);
+      toast({
+        title: 'Something went wrong',
+        description: 'Please try again later.',
+        variant: 'destructive'
+      });
     } finally {
       setIsLoading(false);
     }

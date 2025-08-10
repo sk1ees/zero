@@ -8,3 +8,14 @@
 </p>
 
 <br><br>
+
+## Supabase Auth
+
+Create `.env.local` in the project root with:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+Then run `npm run dev` and visit `/signup` or `/login`.
