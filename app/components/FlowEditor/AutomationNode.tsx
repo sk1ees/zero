@@ -13,7 +13,7 @@ import {
 
 const iconMap = {
   Mail,
-  Trello, 
+  Trello,
   Database,
   Zap,
   Play
@@ -25,17 +25,17 @@ interface AutomationNodeProps {
   id: string;
 }
 
-export const AutomationNode: React.FC<AutomationNodeProps> = ({ 
-  data, 
+export const AutomationNode: React.FC<AutomationNodeProps> = ({
+  data,
   selected = false,
   id
 }) => {
   const { updateNode, removeNode, addNode, nodes } = useAutomationStore();
   const [isRenaming, setIsRenaming] = useState(false);
   const [newName, setNewName] = useState(data.label);
-  
+
   const IconComponent = iconMap[data.icon as keyof typeof iconMap] || Zap;
-  
+
   // Wrapper card color (no translucent background to avoid "transparent" look)
   const getWrapperColor = () => {
     switch (data.type) {
@@ -111,11 +111,11 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
   };
 
   const handleAddErrorHandler = () => {
-    updateNode(id, { 
-      config: { 
-        ...data.config, 
-        hasErrorHandler: true 
-      } 
+    updateNode(id, {
+      config: {
+        ...data.config,
+        hasErrorHandler: true
+      }
     });
   };
 
@@ -126,7 +126,7 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
   const wrapperColorClass = getWrapperColor();
   const iconColorClass = getIconColor();
   const handleColor = getHandleColor();
-  
+
   return (
     <>
       <div className={`
@@ -143,7 +143,7 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
             className={`w-3 h-3 border-2 ${handleColor} hover:scale-110 transition-transform`}
           />
         )}
-        
+
         {/* Node Content */}
         <div className="p-4">
           <div className="flex items-center justify-between mb-3">
@@ -176,7 +176,7 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
                 <p className="text-xs text-muted-foreground capitalize">{data.type}</p>
               </div>
             </div>
-            
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 opacity-60 hover:opacity-100">
@@ -203,7 +203,7 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          
+
           {/* Configuration Summary */}
           {data.config && (
             <div className="space-y-1.5">
@@ -235,7 +235,7 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
             </div>
           )}
         </div>
-        
+
         {/* Output Handles for Actions/Conditions */}
         {(data.type === 'action' || data.type === 'condition') && (
           <>
@@ -249,11 +249,11 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
             <Handle
               type="source"
               position={Position.Bottom}
-              id="error" 
+              id="error"
               className="w-3 h-3 border-2 bg-red-500 border-red-200 dark:border-red-800 hover:scale-110 transition-transform"
               style={{ left: '60%' }}
             />
-            
+
             {/* Success/Error Labels */}
             <div className="absolute -bottom-6 left-0 right-0 flex justify-center gap-8">
               <div className="text-xs text-green-600 dark:text-green-400 font-medium">Success</div>
@@ -261,7 +261,7 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
             </div>
           </>
         )}
-        
+
         {/* Single Output Handle for Triggers and Start nodes */}
         {(data.type === 'trigger' || data.type === 'start') && (
           <Handle
