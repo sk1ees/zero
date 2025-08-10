@@ -206,7 +206,7 @@ const Dashboard = () => {
         {/* Top Header */}
         <header className="bg-card border-b border-border px-4 py-2 shadow-sm">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
                 <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center shadow-sm">
                   <Gauge className="w-4 h-4 text-primary-foreground" />
@@ -275,26 +275,26 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="h-20 flex items-end justify-between space-x-1">
-                  {[8, 15, 22, 18, 35, 42, 38].map((value, index) => (
-                    <div key={index} className="flex-1 flex flex-col items-center">
-                      <div 
-                        className="w-full bg-blue-500/20 rounded-t-sm transition-all duration-300 hover:bg-blue-500/30 cursor-pointer"
-                        style={{ height: `${(value / 45) * 100}%` }}
-                      >
+                  {[12, 28, 35, 42, 38, 51, 47].map((value, index) => {
+                    const maxValue = 51;
+                    const maxHeight = 60; // 60px max height
+                    const barHeight = Math.max((value / maxValue) * maxHeight, 4);
+                    return (
+                      <div key={index} className="flex-1 flex flex-col items-center">
                         <div 
-                          className="w-full bg-blue-500 rounded-t-sm"
-                          style={{ height: `${(value / 45) * 100}%` }}
+                          className="w-full bg-blue-500 rounded-t-sm transition-all duration-300 hover:bg-blue-500/80 cursor-pointer"
+                          style={{ height: `${barHeight}px` }}
                         ></div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {['M', 'T', 'W', 'T', 'F', 'S', 'S'][index]}
+                        </div>
                       </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {['M', 'T', 'W', 'T', 'F', 'S', 'S'][index]}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <div className="flex items-center justify-between mt-2 text-xs">
-                  <span className="text-muted-foreground">Total: 178</span>
-                  <span className="text-green-600 dark:text-green-400">+34%</span>
+                  <span className="text-muted-foreground">Total: 253</span>
+                  <span className="text-green-600 dark:text-green-400">+42%</span>
                 </div>
               </CardContent>
             </Card>
@@ -315,14 +315,14 @@ const Dashboard = () => {
                   <div className="relative">
                     <div className="w-16 h-16 rounded-full border-4 border-muted flex items-center justify-center">
                       <div className="w-12 h-12 rounded-full border-4 border-green-500 border-r-transparent transform -rotate-90 flex items-center justify-center">
-                        <span className="text-xs font-bold text-foreground">87%</span>
+                        <span className="text-xs font-bold text-foreground">94%</span>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center justify-between mt-2 text-xs">
-                  <span className="text-muted-foreground">1,247 total</span>
-                  <span className="text-green-600 dark:text-green-400">+5.2%</span>
+                  <span className="text-muted-foreground">1,856 total</span>
+                  <span className="text-green-600 dark:text-green-400">+7.8%</span>
                 </div>
               </CardContent>
             </Card>
@@ -343,7 +343,7 @@ const Dashboard = () => {
                   <div className="relative">
                     <div className="w-16 h-16 rounded-full border-4 border-muted flex items-center justify-center">
                       <div className="w-12 h-12 rounded-full border-4 border-red-500 border-r-transparent transform -rotate-90 flex items-center justify-center">
-                        <span className="text-xs font-bold text-foreground">13%</span>
+                        <span className="text-xs font-bold text-foreground">6%</span>
                       </div>
                     </div>
                   </div>
@@ -368,22 +368,22 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="h-20 flex items-end justify-between space-x-1">
-                  {[2.1, 1.8, 2.3, 1.9, 2.0, 1.7, 1.6].map((value, index) => (
-                    <div key={index} className="flex-1 flex flex-col items-center">
-                      <div 
-                        className="w-full bg-purple-500/20 rounded-t-sm transition-all duration-300 hover:bg-purple-500/30 cursor-pointer"
-                        style={{ height: `${(value / 3) * 100}%` }}
-                      >
+                  {[2.1, 1.8, 2.3, 1.9, 2.0, 1.7, 1.6].map((value, index) => {
+                    const maxValue = 2.5;
+                    const maxHeight = 60; // 60px max height
+                    const barHeight = Math.max((value / maxValue) * maxHeight, 4);
+                    return (
+                      <div key={index} className="flex-1 flex flex-col items-center">
                         <div 
-                          className="w-full bg-purple-500 rounded-t-sm"
-                          style={{ height: `${(value / 3) * 100}%` }}
+                          className="w-full bg-purple-500 rounded-t-sm transition-all duration-300 hover:bg-purple-500/80 cursor-pointer"
+                          style={{ height: `${barHeight}px` }}
                         ></div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {['M', 'T', 'W', 'T', 'F', 'S', 'S'][index]}
+                        </div>
                       </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {['M', 'T', 'W', 'T', 'F', 'S', 'S'][index]}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <div className="flex items-center justify-between mt-2 text-xs">
                   <span className="text-muted-foreground">1.9s avg</span>
@@ -405,37 +405,50 @@ const Dashboard = () => {
                   <div className="flex items-center space-x-1 text-xs text-muted-foreground">
                     <span>By type</span>
                   </div>
-                </div>
+              </div>
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="flex items-center justify-center h-24">
                   <div className="relative w-20 h-20">
-                    {/* Pie chart segments */}
-                    <div className="absolute inset-0 rounded-full bg-blue-500" style={{ clipPath: 'polygon(50% 50%, 50% 0%, 100% 0%, 100% 50%)' }}></div>
-                    <div className="absolute inset-0 rounded-full bg-green-500" style={{ clipPath: 'polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%)' }}></div>
-                    <div className="absolute inset-0 rounded-full bg-orange-500" style={{ clipPath: 'polygon(50% 50%, 50% 100%, 0% 100%, 0% 50%)' }}></div>
-                    <div className="absolute inset-0 rounded-full bg-purple-500" style={{ clipPath: 'polygon(50% 50%, 0% 50%, 0% 0%, 50% 0%)' }}></div>
-                    <div className="absolute inset-0 rounded-full bg-muted border-2 border-background"></div>
+                    {/* Donut chart using SVG for better compatibility */}
+                    <svg className="w-full h-full" viewBox="0 0 100 100">
+                      {/* Sync - 52% */}
+                      <circle cx="50" cy="50" r="35" fill="none" stroke="#3b82f6" strokeWidth="15" 
+                        strokeDasharray={`${2 * Math.PI * 35 * 0.52} ${2 * Math.PI * 35}`} 
+                        strokeDashoffset={0} transform="rotate(-90 50 50)" />
+                      {/* Table - 28% */}
+                      <circle cx="50" cy="50" r="35" fill="none" stroke="#10b981" strokeWidth="15" 
+                        strokeDasharray={`${2 * Math.PI * 35 * 0.28} ${2 * Math.PI * 35}`} 
+                        strokeDashoffset={`-${2 * Math.PI * 35 * 0.52}`} transform="rotate(-90 50 50)" />
+                      {/* Interface - 12% */}
+                      <circle cx="50" cy="50" r="35" fill="none" stroke="#f97316" strokeWidth="15" 
+                        strokeDasharray={`${2 * Math.PI * 35 * 0.12} ${2 * Math.PI * 35}`} 
+                        strokeDashoffset={`-${2 * Math.PI * 35 * 0.8}`} transform="rotate(-90 50 50)" />
+                      {/* Other - 8% */}
+                      <circle cx="50" cy="50" r="35" fill="none" stroke="#8b5cf6" strokeWidth="15" 
+                        strokeDasharray={`${2 * Math.PI * 35 * 0.08} ${2 * Math.PI * 35}`} 
+                        strokeDashoffset={`-${2 * Math.PI * 35 * 0.92}`} transform="rotate(-90 50 50)" />
+                    </svg>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
                   <div className="flex items-center space-x-1">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-muted-foreground">Sync (45%)</span>
+                    <span className="text-muted-foreground">Sync (52%)</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-muted-foreground">Table (30%)</span>
+                    <span className="text-muted-foreground">Table (28%)</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                    <span className="text-muted-foreground">Interface (15%)</span>
+                    <span className="text-muted-foreground">Interface (12%)</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <span className="text-muted-foreground">Other (10%)</span>
+                    <span className="text-muted-foreground">Other (8%)</span>
                   </div>
-                </div>
+              </div>
               </CardContent>
             </Card>
 
@@ -447,8 +460,8 @@ const Dashboard = () => {
                   <div className="flex items-center space-x-1 text-xs text-muted-foreground">
                     <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
                     <span>Last 30 days</span>
-                  </div>
-                </div>
+              </div>
+            </div>
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="h-24 relative">
@@ -474,9 +487,9 @@ const Dashboard = () => {
                   </svg>
                 </div>
                 <div className="flex items-center justify-between mt-2 text-xs">
-                  <span className="text-muted-foreground">Peak: 95%</span>
-                  <span className="text-cyan-600 dark:text-cyan-400">+18% trend</span>
-                </div>
+                  <span className="text-muted-foreground">Peak: 98%</span>
+                  <span className="text-cyan-600 dark:text-cyan-400">+24% trend</span>
+              </div>
               </CardContent>
             </Card>
 
@@ -487,31 +500,31 @@ const Dashboard = () => {
                   <CardTitle className="text-sm font-semibold text-foreground">Top Apps</CardTitle>
                   <div className="flex items-center space-x-1 text-xs text-muted-foreground">
                     <span>By usage</span>
-                  </div>
-                </div>
+              </div>
+            </div>
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="space-y-2">
                   {[
-                    { name: 'Slack', usage: 85, color: 'bg-blue-500' },
-                    { name: 'Gmail', usage: 72, color: 'bg-red-500' },
-                    { name: 'Trello', usage: 58, color: 'bg-blue-600' },
-                    { name: 'Notion', usage: 45, color: 'bg-gray-500' }
+                    { name: 'Slack', usage: 92, color: 'bg-blue-500' },
+                    { name: 'Gmail', usage: 78, color: 'bg-red-500' },
+                    { name: 'Trello', usage: 65, color: 'bg-blue-600' },
+                    { name: 'Notion', usage: 53, color: 'bg-gray-500' }
                   ].map((app, index) => (
                     <div key={index} className="flex items-center space-x-2">
                       <div className="flex-1">
                         <div className="flex items-center justify-between text-xs mb-1">
                           <span className="text-foreground">{app.name}</span>
                           <span className="text-muted-foreground">{app.usage}%</span>
-                        </div>
+              </div>
                         <div className="w-full bg-muted rounded-full h-1.5">
                           <div 
                             className={`${app.color} h-1.5 rounded-full transition-all duration-300`}
                             style={{ width: `${app.usage}%` }}
                           ></div>
-                        </div>
-                      </div>
-                    </div>
+              </div>
+            </div>
+          </div>
                   ))}
                 </div>
               </CardContent>
@@ -528,45 +541,107 @@ const Dashboard = () => {
               <Card className="bg-card border-border shadow-sm">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm font-semibold text-foreground">What would you like to automate?</CardTitle>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center">
+                        <Zap className="w-3 h-3 text-primary-foreground" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-sm font-semibold text-foreground">What would you like to automate?</CardTitle>
+                        <p className="text-xs text-muted-foreground">AI-powered automation suggestions</p>
+                      </div>
+                    </div>
                     <div className="flex items-center space-x-1 text-green-600 dark:text-green-400 text-xs">
                       <Check className="w-3 h-3" />
-                      <span>Last updated now</span>
+                      <span>AI Ready</span>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div>
-                    <Button variant="outline" className="text-muted-foreground border-border h-7 text-xs">
-                      Show Automation Ideas
-                      <ChevronDown className="w-3 h-3 ml-1" />
-                    </Button>
-                  </div>
-                  
+                  {/* Input Section */}
                   <div className="relative">
-                    <Zap className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
-                    <Input 
-                      placeholder="Example: When I add a reaction to a Slack message, create a card in Trello."
-                      className="pl-8 pr-10 bg-muted border-border h-9 text-xs"
-                    />
-                    <Send className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
+                    <div className="flex items-center space-x-2 p-2 bg-muted/50 border border-border rounded-lg">
+                      <div className="w-5 h-5 bg-primary rounded flex items-center justify-center">
+                        <Zap className="w-3 h-3 text-primary-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <Input 
+                          placeholder="Example: When I add a reaction to a Slack message, create a card in Trello."
+                          className="border-0 bg-transparent text-sm placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+                        />
+                      </div>
+                      <Button size="sm" className="h-7 px-2">
+                        <Send className="w-3 h-3" />
+                      </Button>
+                    </div>
+                    <div className="flex items-center justify-between mt-1 text-xs">
+                      <span className="text-muted-foreground">Powered by AI • Natural language processing</span>
+                      <Button variant="ghost" size="sm" className="h-5 text-xs text-muted-foreground hover:text-foreground">
+                        Show Examples
+                        <ChevronDown className="w-3 h-3 ml-1" />
+                      </Button>
+                    </div>
                   </div>
                   
-                  <div className="grid grid-cols-5 gap-2">
-                    {[
-                      { icon: Zap, title: 'Sync', desc: 'Automated workflows', color: 'text-primary' },
-                      { icon: Grid3X3, title: 'Table', desc: 'Automated data', color: 'text-cyan-500' },
-                      { icon: Square, title: 'Interface', desc: 'Apps, forms, and pages', color: 'text-primary' },
-                      { icon: MessageSquare, title: 'Chatbot', desc: 'AI-powered chatbot', color: 'text-cyan-500' },
-                      { icon: Hexagon, title: 'Canvas', desc: 'Process visualization', color: 'text-primary' }
-                    ].map((item, index) => (
-                      <div key={index} className="text-center p-2 border border-border rounded-lg hover:bg-accent cursor-pointer transition-all duration-200 hover:shadow-sm">
-                        <item.icon className={`w-5 h-5 ${item.color} mx-auto mb-1`} />
-                        <div className="text-xs font-medium text-foreground">{item.title}</div>
-                        <div className="text-xs text-muted-foreground">{item.desc}</div>
-                        <ChevronRight className="w-3 h-3 text-muted-foreground mx-auto mt-1" />
+                  {/* Automation Types */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-foreground mb-2">Choose automation type</h4>
+                    <div className="grid grid-cols-5 gap-2">
+                      {[
+                        { 
+                          icon: Zap, 
+                          title: 'Sync', 
+                          desc: 'Workflows',
+                          color: 'text-blue-600 dark:text-blue-400'
+                        },
+                        { 
+                          icon: Grid3X3, 
+                          title: 'Table', 
+                          desc: 'Data',
+                          color: 'text-green-600 dark:text-green-400'
+                        },
+                        { 
+                          icon: Square, 
+                          title: 'Interface', 
+                          desc: 'Apps & Forms',
+                          color: 'text-purple-600 dark:text-purple-400'
+                        },
+                        { 
+                          icon: MessageSquare, 
+                          title: 'Chatbot', 
+                          desc: 'AI Assistant',
+                          color: 'text-orange-600 dark:text-orange-400'
+                        },
+                        { 
+                          icon: Hexagon, 
+                          title: 'Canvas', 
+                          desc: 'Process Flow',
+                          color: 'text-pink-600 dark:text-pink-400'
+                        }
+                      ].map((item, index) => (
+                        <div key={index} className="group p-2 bg-muted/30 border border-border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors duration-200">
+                          <div className="flex flex-col items-center space-y-1">
+                            <div className={`w-6 h-6 ${item.color} rounded flex items-center justify-center`}>
+                              <item.icon className="w-3 h-3" />
+                            </div>
+                            <div className="text-center">
+                              <div className="text-xs font-medium text-foreground">{item.title}</div>
+                              <div className="text-xs text-muted-foreground">{item.desc}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                        <span>24 templates available</span>
+                        <span>•</span>
+                        <span>AI suggestions</span>
                       </div>
-                    ))}
+                      <Button variant="ghost" size="sm" className="h-6 text-xs text-muted-foreground hover:text-foreground">
+                        View All Types
+                        <ArrowRight className="w-3 h-3 ml-1" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -585,10 +660,12 @@ const Dashboard = () => {
                 <CardContent>
                   <div className="space-y-1">
                     {[
-                      { icon: Zap, title: 'Notify on Form Submission', time: 'Published 13 minutes ago' },
-                      { icon: Grid3X3, title: 'LeadGen CRM Interface', time: 'Updated 39 minutes ago' },
-                      { icon: 'circle', title: 'Leads', time: 'Updated 39 minutes ago' },
-                      { icon: Grid3X3, title: 'SLMobbin', time: 'Updated 58 minutes ago' },
+                      { icon: Zap, title: 'Notify on Form Submission', time: 'Published 8 minutes ago' },
+                      { icon: Grid3X3, title: 'LeadGen CRM Interface', time: 'Updated 25 minutes ago' },
+                      { icon: 'circle', title: 'Leads', time: 'Updated 42 minutes ago' },
+                      { icon: Grid3X3, title: 'SLMobbin', time: 'Updated 1 hour ago' },
+                      { icon: MessageSquare, title: 'Customer Support Bot', time: 'Updated 2 hours ago' },
+                      { icon: Square, title: 'Invoice Generator', time: 'Updated 3 hours ago' },
                     ].map((item, index) => (
                       <div key={index} className="flex items-center space-x-2 p-1.5 hover:bg-accent rounded cursor-pointer transition-colors">
                         {item.icon === 'circle' ? (
@@ -646,7 +723,7 @@ const Dashboard = () => {
                     <div className="text-xs text-foreground mb-1">
                       Save new Gmail emails matching certain traits to a Google Drive
                     </div>
-                    <div className="text-xs text-muted-foreground">Used by 8k</div>
+                    <div className="text-xs text-muted-foreground">Used by 12.5k</div>
                   </div>
                   
                   <div className="flex items-center justify-between">
