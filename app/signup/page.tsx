@@ -102,7 +102,7 @@ const Signup = () => {
         description: 'Welcome to zero.ai!',
         variant: 'success'
       });
-      router.push('/flow');
+      router.push('/dashboard');
       
     } catch (err: any) {
       toast({

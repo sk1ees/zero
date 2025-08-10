@@ -79,7 +79,7 @@ const Login = () => {
         description: 'Welcome back!',
         variant: 'success'
       });
-      router.push('/flow');
+      router.push('/dashboard');
     } catch (err: any) {
       toast({
         title: 'Sign in failed',
