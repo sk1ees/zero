@@ -77,7 +77,7 @@ export const useAutomationStore = create<FlowState>((set, get) => ({
     }));
   },
 
-  setSelectedNode: (node) => set({ selectedNode: node }),
+  setSelectedNode: (node) => set({ selectedNode: node, showConfigPanel: node !== null }),
   setShowConfigPanel: (show) => set({ showConfigPanel: show }),
 
   onNodesChange: (changes) => {
@@ -102,7 +102,7 @@ export const useAutomationStore = create<FlowState>((set, get) => ({
             };
 
             if (change.selected) {
-              set({ selectedNode: updatedNodes[nodeIndex] });
+              set({ selectedNode: updatedNodes[nodeIndex], showConfigPanel: true });
             }
           }
         } else if (change.type === 'remove') {

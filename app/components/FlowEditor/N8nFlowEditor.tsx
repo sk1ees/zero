@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
-import { 
+import {
   Plus,
   Sun,
   Moon
@@ -12,13 +12,14 @@ import { useAutomationStore, generateNodeId, NodeData } from '../../stores/autom
 import { Node } from '@xyflow/react';
 import { CollapsibleSidebar } from './CollapsibleSidebar';
 import { RightPanel } from './RightPanel';
+import { ConfigPanel } from './ConfigPanel';
 import { FlowCanvas } from './FlowCanvas';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
 import { useTheme } from '../theme-provider';
 
 export const N8nFlowEditor: React.FC = () => {
-  const { addNode, setShowConfigPanel } = useAutomationStore();
+  const { addNode, setShowConfigPanel, showConfigPanel } = useAutomationStore();
   const [draggedItem, setDraggedItem] = useState<NodeData | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false);
@@ -30,15 +31,15 @@ export const N8nFlowEditor: React.FC = () => {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { over, active } = event;
-    
+
     if (over && over.id === 'flow-canvas' && draggedItem) {
       const canvasElement = document.getElementById('flow-canvas');
       if (canvasElement) {
         const rect = canvasElement.getBoundingClientRect();
-        
+
         let x = 200;
         let y = 200;
-        
+
         if (event.activatorEvent) {
           const mouseEvent = event.activatorEvent as MouseEvent;
           if (mouseEvent.clientX && mouseEvent.clientY) {
@@ -66,7 +67,7 @@ export const N8nFlowEditor: React.FC = () => {
         addNode(newNode);
       }
     }
-    
+
     setDraggedItem(null);
   };
 
@@ -75,13 +76,13 @@ export const N8nFlowEditor: React.FC = () => {
       const nodeData = event.active.data.current as NodeData;
       handleDragStart(nodeData);
     }} onDragEnd={handleDragEnd}>
-      <div className="flex-1 flex">
+      <div className="flex-1 flex" style={{ height: 'calc(100vh - 48px)' }}>
         {/* Collapsible Left Sidebar */}
-        <CollapsibleSidebar 
+        <CollapsibleSidebar
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
-        
+
         {/* Main Canvas Area */}
         <div className="flex-1 flex flex-col">
           {/* Canvas Toolbar */}
@@ -97,7 +98,7 @@ export const N8nFlowEditor: React.FC = () => {
                 <span className="font-mono">0, 0</span>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -138,20 +139,24 @@ export const N8nFlowEditor: React.FC = () => {
               </Button>
             </div>
           </div>
-          
+
           {/* Flow Canvas */}
           <div className="flex-1 relative" style={{ height: 'calc(100vh - 96px)' }}>
             <FlowCanvas showMiniMap={false} />
           </div>
         </div>
-        
-        {/* Right Panel for Triggers and Actions */}
-        <RightPanel 
-          isCollapsed={isRightPanelCollapsed}
-          onToggleCollapse={() => setIsRightPanelCollapsed(!isRightPanelCollapsed)}
-        />
+
+        {/* Right-side panel: show config form when a node is selected, otherwise show nodes library */}
+        {showConfigPanel ? (
+          <ConfigPanel />
+        ) : (
+          <RightPanel
+            isCollapsed={isRightPanelCollapsed}
+            onToggleCollapse={() => setIsRightPanelCollapsed(!isRightPanelCollapsed)}
+          />
+        )}
       </div>
-      
+
       {/* Drag Overlay */}
       <DragOverlay>
         {draggedItem && <NodeDragItem nodeData={draggedItem} />}

@@ -55,28 +55,28 @@ export const ConfigPanel: React.FC = () => {
               variant="outline"
               size="sm"
               className="w-full h-8 text-xs"
-                             onClick={() => {
-                 // Add a new node when Add button is clicked
-                 const { addNode } = useAutomationStore.getState();
-                 const newNode = {
-                   id: generateNodeId(),
-                   type: 'automation',
-                   position: { x: 200, y: 200 },
-                   data: {
-                     id: generateNodeId(),
-                     type: 'action' as const,
-                     label: 'New Node',
-                     icon: 'Zap',
-                     config: {
-                       method: 'GET',
-                       url: '',
-                       queryParams: [],
-                       description: ''
-                     }
-                   }
-                 };
-                 addNode(newNode);
-               }}
+              onClick={() => {
+                // Add a new node when Add button is clicked
+                const { addNode } = useAutomationStore.getState();
+                const newNode = {
+                  id: generateNodeId(),
+                  type: 'automation',
+                  position: { x: 200, y: 200 },
+                  data: {
+                    id: generateNodeId(),
+                    type: 'action' as const,
+                    label: 'New Node',
+                    icon: 'Zap',
+                    config: {
+                      method: 'GET',
+                      url: '',
+                      queryParams: [],
+                      description: ''
+                    }
+                  }
+                };
+                addNode(newNode);
+              }}
             >
               <Plus className="w-3 h-3 mr-1" />
               Add New Node
@@ -116,9 +116,9 @@ export const ConfigPanel: React.FC = () => {
   };
 
   return (
-    <div className="w-64 bg-card border-l border-border flex flex-col">
+    <div className="w-64 bg-card border-l border-border flex flex-col h-full">
       {/* Header */}
-      <div className="p-3 border-b border-border flex items-center justify-between">
+      <div className="p-3 border-b border-border flex items-center justify-between sticky top-0 z-10 bg-card">
         <div className="flex items-center gap-2">
           <Settings className="w-3 h-3 text-primary" />
           <h2 className="font-semibold text-foreground text-xs">Configuration</h2>
@@ -133,7 +133,7 @@ export const ConfigPanel: React.FC = () => {
         </Button>
       </div>
 
-      {/* Content */}
+      {/* Content (scrollable) */}
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
         {/* Node Info */}
         <Card className="border-border/50">
@@ -194,18 +194,18 @@ export const ConfigPanel: React.FC = () => {
         {/* Query Parameters */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label className="text-xs font-medium">Query Parameters</Label>
+            <Label className="text-xs font-medium">Query String Parameters</Label>
             <Button
               variant="outline"
               size="sm"
               onClick={addQueryParam}
               className="h-7 text-xs"
+              title="Add parameter"
             >
-              <Plus className="w-3 h-3 mr-1" />
-              Add
+              <Plus className="w-3 h-3" />
             </Button>
           </div>
-          
+
           {(config.queryParams || []).map((param, index: number) => (
             <div key={index} className="flex gap-2 items-center">
               <Input
@@ -230,12 +230,19 @@ export const ConfigPanel: React.FC = () => {
               </Button>
             </div>
           ))}
-          
+
           {(!config.queryParams || config.queryParams.length === 0) && (
             <div className="text-xs text-muted-foreground italic text-center py-3 bg-muted/30 rounded-lg">
               No query parameters added
             </div>
           )}
+          <button
+            type="button"
+            onClick={addQueryParam}
+            className="text-[11px] text-primary hover:underline"
+          >
+            Add value set
+          </button>
         </div>
 
         <Separator />
@@ -268,8 +275,8 @@ export const ConfigPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Footer Actions */}
-      <div className="p-3 border-t border-border flex gap-2">
+      {/* Footer Actions (sticky) */}
+      <div className="p-3 border-t border-border flex gap-2 sticky bottom-0 z-10 bg-card">
         <Button
           variant="outline"
           size="sm"
@@ -283,10 +290,10 @@ export const ConfigPanel: React.FC = () => {
           className="flex-1 text-red-600 border-red-200 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/20 h-7 text-xs"
         >
           <Trash2 className="w-2.5 h-2.5 mr-1" />
-          Delete
+          Delete Block
         </Button>
         <Button size="sm" className="flex-1 h-7 text-xs">
-          Save
+          Continue
         </Button>
       </div>
     </div>
