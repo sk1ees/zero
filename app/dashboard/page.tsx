@@ -39,6 +39,7 @@ import { Badge } from '../components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Separator } from '../components/ui/separator';
 import { ThemeToggle } from '../components/theme-toggle';
+import SearchDialog from '../components/SearchDialog';
 
 const Dashboard = () => {
   const [appsExpanded, setAppsExpanded] = useState(true);
@@ -63,11 +64,7 @@ const Dashboard = () => {
               </div>
             </div>
           )}
-          {sidebarCollapsed && (
-            <div className="w-6 h-6 bg-muted rounded-lg flex items-center justify-center">
-              <Gauge className="w-4 h-4 text-muted-foreground" />
-            </div>
-          )}
+
           <Button
             variant="ghost"
             size="sm"
@@ -81,6 +78,37 @@ const Dashboard = () => {
             )}
           </Button>
         </div>
+
+      
+        {/* User Profile */}
+        <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-2'} mb-4 p-2 bg-card rounded-lg border border-border shadow-sm`}>
+          <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center">
+            <User className="w-3 h-3 text-muted-foreground" />
+          </div>
+          {!sidebarCollapsed && (
+            <>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium text-foreground truncate">Kristin Watson</div>
+                <div className="text-xs text-muted-foreground truncate">watsonkristin@mail.com</div>
+              </div>
+              <ChevronDown className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+            </>
+          )}
+        </div>
+  {/* Plan Info */}
+  {!sidebarCollapsed && (
+          <Card className="bg-muted border-border shadow-sm mb-4">
+            <CardContent className="p-3">
+              <div className="text-xs font-medium text-foreground mb-1">Professional plan (Trial)</div>
+              <div className="text-xs text-muted-foreground mb-2">Task 324/1,000</div>
+              <div className="w-full bg-muted-foreground/20 rounded-full h-1 mb-2">
+                <div className="bg-primary h-1 rounded-full transition-all duration-300" style={{ width: '32.4%' }}></div>
+              </div>
+              <div className="text-xs text-muted-foreground mb-2">Sync Unlimited</div>
+              <Button variant="outline" className="w-full text-xs h-6">Manage Plan</Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Create Button */}
         <Button className={`${sidebarCollapsed ? 'w-6 h-6 p-0' : 'w-full h-8'} bg-primary hover:bg-primary/90 text-primary-foreground mb-4 shadow-sm flex items-center justify-center text-xs`}>
@@ -168,38 +196,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Plan Info */}
-        <div className="mt-auto">
-          {!sidebarCollapsed && (
-            <Card className="bg-muted border-border shadow-sm">
-              <CardContent className="p-3">
-                <div className="text-xs font-medium text-foreground mb-1">Professional plan (Trial)</div>
-                <div className="text-xs text-muted-foreground mb-2">Task 324/1,000</div>
-                <div className="w-full bg-muted-foreground/20 rounded-full h-1 mb-2">
-                  <div className="bg-primary h-1 rounded-full transition-all duration-300" style={{ width: '32.4%' }}></div>
-                </div>
-                <div className="text-xs text-muted-foreground mb-2">Sync Unlimited</div>
-                <Button variant="outline" className="w-full text-xs h-6">Manage Plan</Button>
-              </CardContent>
-            </Card>
-          )}
 
-          {/* User Profile */}
-          <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-2'} mt-3 p-2 bg-card rounded-lg border border-border shadow-sm`}>
-            <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center">
-              <User className="w-3 h-3 text-muted-foreground" />
-            </div>
-            {!sidebarCollapsed && (
-              <>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-medium text-foreground truncate">Kristin Watson</div>
-                  <div className="text-xs text-muted-foreground truncate">watsonkristin@mail.com</div>
-                </div>
-                <ChevronDown className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-              </>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Main Content */}
@@ -220,13 +217,16 @@ const Dashboard = () => {
             </div>
 
             <div className="flex items-center space-x-2">
-              <div className="relative">
-                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-muted-foreground" />
-                <Input 
-                  placeholder="Search something" 
-                  className="pl-7 w-48 bg-muted border-border h-7 text-xs"
-                />
-              </div>
+              <SearchDialog>
+                <div className="relative">
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search something" 
+                    className="pl-7 w-48 bg-muted border-border h-7 text-xs cursor-pointer"
+                    readOnly
+                  />
+                </div>
+              </SearchDialog>
               
               <Button variant="outline" className="text-muted-foreground border-border h-7 text-xs">
                 Contact Sales
@@ -568,10 +568,13 @@ const Dashboard = () => {
                             <Zap className="w-3 h-3 text-primary-foreground" />
                           </div>
                           <div className="flex-1">
-                            <Input 
-                              placeholder="Describe your automation: 'When I receive an email, create a task in Notion'"
-                              className="border-0 bg-transparent text-base placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
-                            />
+                            <SearchDialog>
+                              <Input 
+                                placeholder="Describe your automation: 'When I receive an email, create a task in Notion'"
+                                className="border-0 bg-transparent text-base placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
+                                readOnly
+                              />
+                            </SearchDialog>
                           </div>
                           <Button size="sm" className="h-8 px-4 bg-primary hover:bg-primary/90 shadow-sm">
                             <Send className="w-4 h-4 mr-2" />
