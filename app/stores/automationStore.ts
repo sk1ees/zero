@@ -25,7 +25,7 @@ export interface FlowState {
   edges: Edge[];
   selectedNode: Node<NodeData> | null;
   showConfigPanel: boolean;
-  
+
   // Actions
   setNodes: (nodes: Node<NodeData>[]) => void;
   setEdges: (edges: Edge[]) => void;
@@ -83,7 +83,7 @@ export const useAutomationStore = create<FlowState>((set, get) => ({
   onNodesChange: (changes) => {
     set((state) => {
       const updatedNodes = [...state.nodes];
-      
+
       changes.forEach((change) => {
         if (change.type === 'position' && change.position) {
           const nodeIndex = updatedNodes.findIndex((n) => n.id === change.id);
@@ -100,7 +100,7 @@ export const useAutomationStore = create<FlowState>((set, get) => ({
               ...updatedNodes[nodeIndex],
               selected: change.selected
             };
-            
+
             if (change.selected) {
               set({ selectedNode: updatedNodes[nodeIndex] });
             }
@@ -110,7 +110,7 @@ export const useAutomationStore = create<FlowState>((set, get) => ({
           return;
         }
       });
-      
+
       return { nodes: updatedNodes };
     });
   },
@@ -118,13 +118,13 @@ export const useAutomationStore = create<FlowState>((set, get) => ({
   onEdgesChange: (changes) => {
     set((state) => {
       let updatedEdges = [...state.edges];
-      
+
       changes.forEach((change) => {
         if (change.type === 'remove') {
           updatedEdges = updatedEdges.filter((edge) => edge.id !== change.id);
         }
       });
-      
+
       return { edges: updatedEdges };
     });
   },

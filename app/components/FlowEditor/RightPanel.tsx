@@ -132,6 +132,8 @@ const CompactDraggableNode: React.FC<CompactDraggableNodeProps> = ({ nodeData })
 
   const getNodeColor = () => {
     switch (nodeData.type) {
+      case 'start':
+        return 'border-l-green-500 bg-green-50/50 dark:bg-green-950/20';
       case 'trigger':
         return 'border-l-blue-500 bg-blue-50/50 dark:bg-blue-950/20';
       case 'action':
@@ -270,6 +272,20 @@ export const RightPanel: React.FC<RightPanelProps> = ({
                 className="pl-7 h-7 text-xs border-border/30 bg-background/50 focus:bg-background"
               />
             </div>
+
+            {/* Start Node (General) */}
+            {!selectedApp && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-medium text-muted-foreground/80 uppercase tracking-wide">Start</div>
+                </div>
+                <div className="space-y-1.5">
+                  <CompactDraggableNode
+                    nodeData={{ id: 'start-node', type: 'start', label: 'Start', icon: 'Play' }}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* App Selection */}
             {!selectedApp && (
