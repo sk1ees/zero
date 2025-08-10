@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   Plus, 
   Search, 
@@ -31,7 +32,8 @@ import {
   BarChart3,
   PanelLeftClose,
   PanelLeftOpen,
-  AlertTriangle
+  AlertTriangle,
+  Workflow
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -42,6 +44,7 @@ import { ThemeToggle } from '../components/theme-toggle';
 import SearchDialog from '../components/SearchDialog';
 
 const Dashboard = () => {
+  const router = useRouter();
   const [appsExpanded, setAppsExpanded] = useState(true);
   const [syncHistoryExpanded, setSyncHistoryExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('most-popular');
@@ -125,6 +128,13 @@ const Dashboard = () => {
           <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-2'} p-2 text-muted-foreground hover:bg-accent rounded-lg cursor-pointer transition-colors`}>
             <Zap className="w-3 h-3" />
             {!sidebarCollapsed && <span className="text-xs">Sync</span>}
+          </div>
+          <div 
+            className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-2'} p-2 text-muted-foreground hover:bg-accent rounded-lg cursor-pointer transition-colors`}
+            onClick={() => router.push('/flow')}
+          >
+            <Workflow className="w-3 h-3" />
+            {!sidebarCollapsed && <span className="text-xs">Workflow</span>}
           </div>
           <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-2'} p-2 text-muted-foreground hover:bg-accent rounded-lg cursor-pointer transition-colors`}>
             <Globe className="w-3 h-3" />
