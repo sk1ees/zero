@@ -102,7 +102,7 @@ export const Sidebar: React.FC = () => {
             <Zap className="w-4 h-4 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-sidebar-foreground">Automake</h1>
+            <h1 className="text-lg font-semibold text-sidebar-foreground">zamuri.ai</h1>
             <p className="text-xs text-sidebar-foreground/60">Professional Plan</p>
           </div>
         </div>

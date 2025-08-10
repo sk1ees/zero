@@ -59,7 +59,7 @@ const Dashboard = () => {
                 <Gauge className="w-4 h-4 text-primary-foreground" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-foreground">Automake</div>
+                <div className="text-sm font-semibold text-foreground">zamuri.ai</div>
                 <div className="text-xs text-muted-foreground">Professional Plan</div>
               </div>
             </div>
@@ -210,7 +210,7 @@ const Dashboard = () => {
                   <Gauge className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <div>
-                  <span className="text-sm font-semibold text-foreground">Automake</span>
+                  <span className="text-sm font-semibold text-foreground">zamuri.ai</span>
                   <span className="text-xs text-muted-foreground ml-1">Professional Plan</span>
                 </div>
               </div>
@@ -568,13 +568,10 @@ const Dashboard = () => {
                             <Zap className="w-3 h-3 text-primary-foreground" />
                           </div>
                           <div className="flex-1">
-                            <SearchDialog>
-                              <Input 
-                                placeholder="Describe your automation: 'When I receive an email, create a task in Notion'"
-                                className="border-0 bg-transparent text-base placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
-                                readOnly
-                              />
-                            </SearchDialog>
+                            <Input 
+                              placeholder="Describe your automation: 'When I receive an email, create a task in Notion'"
+                              className="border-0 bg-transparent text-base placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+                            />
                           </div>
                           <Button size="sm" className="h-8 px-4 bg-primary hover:bg-primary/90 shadow-sm">
                             <Send className="w-4 h-4 mr-2" />
