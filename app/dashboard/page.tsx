@@ -259,6 +259,266 @@ const Dashboard = () => {
           </div>
         </header>
 
+                {/* Analytics Charts */}
+        <div className="px-4 py-3 bg-card border-b border-border">
+          <div className="grid grid-cols-4 gap-4">
+            {/* Execution Trends Chart */}
+            <Card className="bg-card border-border shadow-sm">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-semibold text-foreground">Execution Trends</CardTitle>
+                  <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span>Last 7 days</span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="h-20 flex items-end justify-between space-x-1">
+                  {[8, 15, 22, 18, 35, 42, 38].map((value, index) => (
+                    <div key={index} className="flex-1 flex flex-col items-center">
+                      <div 
+                        className="w-full bg-blue-500/20 rounded-t-sm transition-all duration-300 hover:bg-blue-500/30 cursor-pointer"
+                        style={{ height: `${(value / 45) * 100}%` }}
+                      >
+                        <div 
+                          className="w-full bg-blue-500 rounded-t-sm"
+                          style={{ height: `${(value / 45) * 100}%` }}
+                        ></div>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {['M', 'T', 'W', 'T', 'F', 'S', 'S'][index]}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between mt-2 text-xs">
+                  <span className="text-muted-foreground">Total: 178</span>
+                  <span className="text-green-600 dark:text-green-400">+34%</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Success Rate Chart */}
+            <Card className="bg-card border-border shadow-sm">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-semibold text-foreground">Success Rate</CardTitle>
+                  <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>This month</span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="flex items-center justify-center h-20">
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-full border-4 border-muted flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full border-4 border-green-500 border-r-transparent transform -rotate-90 flex items-center justify-center">
+                        <span className="text-xs font-bold text-foreground">87%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-2 text-xs">
+                  <span className="text-muted-foreground">1,247 total</span>
+                  <span className="text-green-600 dark:text-green-400">+5.2%</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Error Rate Chart */}
+            <Card className="bg-card border-border shadow-sm">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-semibold text-foreground">Error Rate</CardTitle>
+                  <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <span>This month</span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="flex items-center justify-center h-20">
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-full border-4 border-muted flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full border-4 border-red-500 border-r-transparent transform -rotate-90 flex items-center justify-center">
+                        <span className="text-xs font-bold text-foreground">13%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-2 text-xs">
+                  <span className="text-muted-foreground">186 errors</span>
+                  <span className="text-red-600 dark:text-red-400">-2.1%</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Response Time Chart */}
+            <Card className="bg-card border-border shadow-sm">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-semibold text-foreground">Avg Response</CardTitle>
+                  <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span>This week</span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="h-20 flex items-end justify-between space-x-1">
+                  {[2.1, 1.8, 2.3, 1.9, 2.0, 1.7, 1.6].map((value, index) => (
+                    <div key={index} className="flex-1 flex flex-col items-center">
+                      <div 
+                        className="w-full bg-purple-500/20 rounded-t-sm transition-all duration-300 hover:bg-purple-500/30 cursor-pointer"
+                        style={{ height: `${(value / 3) * 100}%` }}
+                      >
+                        <div 
+                          className="w-full bg-purple-500 rounded-t-sm"
+                          style={{ height: `${(value / 3) * 100}%` }}
+                        ></div>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {['M', 'T', 'W', 'T', 'F', 'S', 'S'][index]}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between mt-2 text-xs">
+                  <span className="text-muted-foreground">1.9s avg</span>
+                  <span className="text-green-600 dark:text-green-400">-12%</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Detailed Analytics */}
+        <div className="px-4 py-3 bg-card border-b border-border">
+          <div className="grid grid-cols-3 gap-4">
+            {/* Flow Distribution Pie Chart */}
+            <Card className="bg-card border-border shadow-sm">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-semibold text-foreground">Flow Distribution</CardTitle>
+                  <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                    <span>By type</span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="flex items-center justify-center h-24">
+                  <div className="relative w-20 h-20">
+                    {/* Pie chart segments */}
+                    <div className="absolute inset-0 rounded-full bg-blue-500" style={{ clipPath: 'polygon(50% 50%, 50% 0%, 100% 0%, 100% 50%)' }}></div>
+                    <div className="absolute inset-0 rounded-full bg-green-500" style={{ clipPath: 'polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%)' }}></div>
+                    <div className="absolute inset-0 rounded-full bg-orange-500" style={{ clipPath: 'polygon(50% 50%, 50% 100%, 0% 100%, 0% 50%)' }}></div>
+                    <div className="absolute inset-0 rounded-full bg-purple-500" style={{ clipPath: 'polygon(50% 50%, 0% 50%, 0% 0%, 50% 0%)' }}></div>
+                    <div className="absolute inset-0 rounded-full bg-muted border-2 border-background"></div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-muted-foreground">Sync (45%)</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-muted-foreground">Table (30%)</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                    <span className="text-muted-foreground">Interface (15%)</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span className="text-muted-foreground">Other (10%)</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Performance Line Chart */}
+            <Card className="bg-card border-border shadow-sm">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-semibold text-foreground">Performance Trend</CardTitle>
+                  <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                    <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
+                    <span>Last 30 days</span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="h-24 relative">
+                  {/* Line chart */}
+                  <svg className="w-full h-full" viewBox="0 0 100 40">
+                    <path
+                      d="M0,35 L10,30 L20,25 L30,20 L40,15 L50,10 L60,12 L70,8 L80,5 L90,3 L100,0"
+                      stroke="rgb(6 182 212)"
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                    <path
+                      d="M0,35 L10,30 L20,25 L30,20 L40,15 L50,10 L60,12 L70,8 L80,5 L90,3 L100,0 L100,40 L0,40 Z"
+                      fill="url(#gradient)"
+                      opacity="0.2"
+                    />
+                    <defs>
+                      <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="rgb(6 182 212)" stopOpacity="0.8"/>
+                        <stop offset="100%" stopColor="rgb(6 182 212)" stopOpacity="0"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+                <div className="flex items-center justify-between mt-2 text-xs">
+                  <span className="text-muted-foreground">Peak: 95%</span>
+                  <span className="text-cyan-600 dark:text-cyan-400">+18% trend</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Top Apps Usage */}
+            <Card className="bg-card border-border shadow-sm">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-semibold text-foreground">Top Apps</CardTitle>
+                  <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                    <span>By usage</span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2">
+                  {[
+                    { name: 'Slack', usage: 85, color: 'bg-blue-500' },
+                    { name: 'Gmail', usage: 72, color: 'bg-red-500' },
+                    { name: 'Trello', usage: 58, color: 'bg-blue-600' },
+                    { name: 'Notion', usage: 45, color: 'bg-gray-500' }
+                  ].map((app, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span className="text-foreground">{app.name}</span>
+                          <span className="text-muted-foreground">{app.usage}%</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-1.5">
+                          <div 
+                            className={`${app.color} h-1.5 rounded-full transition-all duration-300`}
+                            style={{ width: `${app.usage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
         {/* Main Content Area */}
         <div className="flex-1 p-4 bg-background">
           <div className="grid grid-cols-2 gap-4 h-full">
