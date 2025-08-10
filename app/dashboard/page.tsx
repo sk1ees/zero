@@ -30,7 +30,8 @@ import {
   Activity,
   BarChart3,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  AlertTriangle
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -241,6 +242,7 @@ const Dashboard = () => {
                 <Button variant="ghost" size="sm" className="w-6 h-6 p-0 hover:bg-accent">
                   <Settings className="w-3 h-3 text-muted-foreground" />
                 </Button>
+                <ThemeToggle />
               </div>
               
               <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center">
@@ -533,246 +535,284 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 p-4 bg-background">
-          <div className="grid grid-cols-2 gap-4 h-full">
-            {/* Left Column */}
-            <div className="space-y-4">
-              {/* What would you like to automate? */}
-              <Card className="bg-card border-border shadow-sm">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center">
-                        <Zap className="w-3 h-3 text-primary-foreground" />
+        <div className="flex-1 p-6 bg-background">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Column - Automation Hub */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* AI Automation Section */}
+                <Card className="bg-gradient-to-br from-card to-card/80 border-border shadow-lg">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
+                          <Zap className="w-4 h-4 text-primary-foreground" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg font-bold text-foreground">AI Automation Hub</CardTitle>
+                          <p className="text-sm text-muted-foreground">Create intelligent workflows with natural language</p>
+                        </div>
                       </div>
-                      <div>
-                        <CardTitle className="text-sm font-semibold text-foreground">What would you like to automate?</CardTitle>
-                        <p className="text-xs text-muted-foreground">AI-powered automation suggestions</p>
+                      <div className="flex items-center space-x-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full">
+                        <Check className="w-4 h-4 text-green-500" />
+                        <span className="text-sm font-medium text-green-600 dark:text-green-400">AI Ready</span>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-1 text-green-600 dark:text-green-400 text-xs">
-                      <Check className="w-3 h-3" />
-                      <span>AI Ready</span>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {/* Input Section */}
-                  <div className="relative">
-                    <div className="flex items-center space-x-2 p-2 bg-muted/50 border border-border rounded-lg">
-                      <div className="w-5 h-5 bg-primary rounded flex items-center justify-center">
-                        <Zap className="w-3 h-3 text-primary-foreground" />
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Enhanced Input Section */}
+                    <div className="space-y-3">
+                      <div className="relative group">
+                        <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-muted/30 to-muted/50 border border-border rounded-xl hover:border-primary/50 transition-all duration-300">
+                          <div className="w-6 h-6 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center shadow-sm">
+                            <Zap className="w-3 h-3 text-primary-foreground" />
+                          </div>
+                          <div className="flex-1">
+                            <Input 
+                              placeholder="Describe your automation: 'When I receive an email, create a task in Notion'"
+                              className="border-0 bg-transparent text-base placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+                            />
+                          </div>
+                          <Button size="sm" className="h-8 px-4 bg-primary hover:bg-primary/90 shadow-sm">
+                            <Send className="w-4 h-4 mr-2" />
+                            Create
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between mt-2 px-1">
+                          <span className="text-sm text-muted-foreground">Powered by advanced AI • Natural language processing</span>
+                          <Button variant="ghost" size="sm" className="text-sm text-muted-foreground hover:text-foreground">
+                            Show Examples
+                            <ChevronDown className="w-4 h-4 ml-1" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <Input 
-                          placeholder="Example: When I add a reaction to a Slack message, create a card in Trello."
-                          className="border-0 bg-transparent text-sm placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
-                        />
+                    </div>
+                    
+                    {/* Redesigned Automation Types */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-base font-semibold text-foreground">Choose automation type</h4>
+                        <Button variant="ghost" size="sm" className="text-sm text-primary hover:text-primary/80">
+                          View All Types
+                          <ArrowRight className="w-4 h-4 ml-1" />
+                        </Button>
                       </div>
-                      <Button size="sm" className="h-7 px-2">
-                        <Send className="w-3 h-3" />
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-between mt-1 text-xs">
-                      <span className="text-muted-foreground">Powered by AI • Natural language processing</span>
-                      <Button variant="ghost" size="sm" className="h-5 text-xs text-muted-foreground hover:text-foreground">
-                        Show Examples
-                        <ChevronDown className="w-3 h-3 ml-1" />
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  {/* Automation Types */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-foreground mb-2">Choose automation type</h4>
-                    <div className="grid grid-cols-5 gap-2">
-                      {[
-                        { 
-                          icon: Zap, 
-                          title: 'Sync', 
-                          desc: 'Workflows',
-                          color: 'text-blue-600 dark:text-blue-400'
-                        },
-                        { 
-                          icon: Grid3X3, 
-                          title: 'Table', 
-                          desc: 'Data',
-                          color: 'text-green-600 dark:text-green-400'
-                        },
-                        { 
-                          icon: Square, 
-                          title: 'Interface', 
-                          desc: 'Apps & Forms',
-                          color: 'text-purple-600 dark:text-purple-400'
-                        },
-                        { 
-                          icon: MessageSquare, 
-                          title: 'Chatbot', 
-                          desc: 'AI Assistant',
-                          color: 'text-orange-600 dark:text-orange-400'
-                        },
-                        { 
-                          icon: Hexagon, 
-                          title: 'Canvas', 
-                          desc: 'Process Flow',
-                          color: 'text-pink-600 dark:text-pink-400'
-                        }
-                      ].map((item, index) => (
-                        <div key={index} className="group p-2 bg-muted/30 border border-border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors duration-200">
-                          <div className="flex flex-col items-center space-y-1">
-                            <div className={`w-6 h-6 ${item.color} rounded flex items-center justify-center`}>
-                              <item.icon className="w-3 h-3" />
-                            </div>
-                            <div className="text-center">
-                              <div className="text-xs font-medium text-foreground">{item.title}</div>
-                              <div className="text-xs text-muted-foreground">{item.desc}</div>
+                      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                        {[
+                          { 
+                            icon: Zap, 
+                            title: 'Sync', 
+                            desc: 'Workflows'
+                          },
+                          { 
+                            icon: Grid3X3, 
+                            title: 'Table', 
+                            desc: 'Data'
+                          },
+                          { 
+                            icon: Square, 
+                            title: 'Interface', 
+                            desc: 'Apps & Forms'
+                          },
+                          { 
+                            icon: MessageSquare, 
+                            title: 'Chatbot', 
+                            desc: 'AI Assistant'
+                          },
+                          { 
+                            icon: Hexagon, 
+                            title: 'Canvas', 
+                            desc: 'Process Flow'
+                          }
+                        ].map((item, index) => (
+                          <div key={index} className="group p-4 bg-card border border-border rounded-xl hover:scale-105 cursor-pointer transition-all duration-300 hover:shadow-md hover:border-primary/50">
+                            <div className="flex flex-col items-center space-y-3">
+                              <div className="w-10 h-10 bg-muted rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-lg transition-shadow group-hover:bg-primary/10">
+                                <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                              </div>
+                              <div className="text-center">
+                                <div className="text-sm font-semibold text-foreground">{item.title}</div>
+                                <div className="text-xs text-muted-foreground">{item.desc}</div>
+                              </div>
                             </div>
                           </div>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-center pt-2">
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                          <span>24 templates available</span>
+                          <span>•</span>
+                          <span>AI suggestions</span>
+                          <span>•</span>
+                          <span>Custom workflows</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Recently Updated Section */}
+                <Card className="bg-card border-border shadow-lg">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center">
+                          <Activity className="w-4 h-4 text-primary-foreground" />
+                        </div>
+                        <CardTitle className="text-lg font-bold text-foreground">Recent Activity</CardTitle>
+                      </div>
+                      <Button variant="outline" className="text-muted-foreground border-border">
+                        View All
+                        <ChevronRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {[
+                        { icon: Zap, title: 'Notify on Form Submission', time: 'Published 8 minutes ago', status: 'published' },
+                        { icon: Grid3X3, title: 'LeadGen CRM Interface', time: 'Updated 25 minutes ago', status: 'updated' },
+                      ].map((item, index) => (
+                        <div key={index} className="flex items-center space-x-3 p-3 hover:bg-accent/50 rounded-lg cursor-pointer transition-all duration-200 group">
+                          <div className="relative">
+                            <div className="w-8 h-8 bg-gradient-to-br from-primary/10 to-primary/20 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                              <item.icon className="w-4 h-4 text-primary" />
+                            </div>
+                            {item.status === 'published' && (
+                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-foreground truncate">{item.title}</div>
+                            <div className="text-xs text-muted-foreground">{item.time}</div>
+                          </div>
+                          <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                            <ArrowRight className="w-4 h-4" />
+                          </Button>
                         </div>
                       ))}
                     </div>
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                        <span>24 templates available</span>
-                        <span>•</span>
-                        <span>AI suggestions</span>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Right Column - Templates & Issues */}
+              <div className="space-y-6">
+                {/* Popular Templates */}
+                <Card className="bg-card border-border shadow-lg">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center">
+                          <svg className="w-4 h-4 text-primary-foreground" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        </div>
+                        <CardTitle className="text-lg font-bold text-foreground">Popular Templates</CardTitle>
                       </div>
-                      <Button variant="ghost" size="sm" className="h-6 text-xs text-muted-foreground hover:text-foreground">
-                        View All Types
-                        <ArrowRight className="w-3 h-3 ml-1" />
+                      <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-accent">
+                        <MoreVertical className="w-4 h-4 text-muted-foreground" />
                       </Button>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Recently updated */}
-              <Card className="bg-card border-border shadow-sm">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm font-semibold text-foreground">Recently updated</CardTitle>
-                    <Button variant="outline" className="text-muted-foreground border-border h-7 text-xs">
-                      All recently updated
-                      <ChevronDown className="w-3 h-3 ml-1" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-1">
-                    {[
-                      { icon: Zap, title: 'Notify on Form Submission', time: 'Published 8 minutes ago' },
-                      { icon: Grid3X3, title: 'LeadGen CRM Interface', time: 'Updated 25 minutes ago' },
-                      { icon: 'circle', title: 'Leads', time: 'Updated 42 minutes ago' },
-                      { icon: Grid3X3, title: 'SLMobbin', time: 'Updated 1 hour ago' },
-                      { icon: MessageSquare, title: 'Customer Support Bot', time: 'Updated 2 hours ago' },
-                      { icon: Square, title: 'Invoice Generator', time: 'Updated 3 hours ago' },
-                    ].map((item, index) => (
-                      <div key={index} className="flex items-center space-x-2 p-1.5 hover:bg-accent rounded cursor-pointer transition-colors">
-                        {item.icon === 'circle' ? (
-                          <div className="w-4 h-4 bg-primary rounded-full"></div>
-                        ) : (
-                          <item.icon className="w-4 h-4 text-primary" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <div className="text-xs font-medium text-foreground truncate">{item.title}</div>
-                          <div className="text-xs text-muted-foreground">{item.time}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Right Column */}
-            <div className="space-y-4">
-              {/* Popular Templates */}
-              <Card className="bg-card border-border shadow-sm">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm font-semibold text-foreground">Popular Templates</CardTitle>
-                    <Button variant="ghost" size="sm" className="w-6 h-6 p-0 hover:bg-accent">
-                      <MoreVertical className="w-3 h-3 text-muted-foreground" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex space-x-1">
-                    {['most-popular', 'trending', 'top-role'].map((tab) => (
-                      <Button 
-                        key={tab}
-                        variant={activeTab === tab ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={() => setActiveTab(tab)}
-                        className={`text-xs h-6 ${activeTab === tab ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-accent'}`}
-                      >
-                        {tab === 'most-popular' ? 'Most popular' : 
-                         tab === 'trending' ? 'Trending this week' : 'Top by role'}
-                      </Button>
-                    ))}
-                  </div>
-                  
-                  <div className="border border-border rounded-lg p-3 bg-muted">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <div className="w-6 h-6 bg-red-500 rounded flex items-center justify-center text-white font-bold text-xs">M</div>
-                      <ArrowRight className="w-3 h-3 text-muted-foreground" />
-                      <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center text-white">
-                        <div className="w-0 h-0 border-l-2 border-l-transparent border-r-2 border-r-transparent border-b-4 border-b-white"></div>
-                      </div>
-                    </div>
-                    <div className="text-xs text-foreground mb-1">
-                      Save new Gmail emails matching certain traits to a Google Drive
-                    </div>
-                    <div className="text-xs text-muted-foreground">Used by 12.5k</div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <Button variant="outline" size="sm" className="text-muted-foreground border-border h-6 text-xs">
-                      <ArrowLeft className="w-3 h-3 mr-1" />
-                      Previous
-                    </Button>
-                    <Button variant="outline" size="sm" className="text-muted-foreground border-border h-6 text-xs">
-                      Next
-                      <ArrowRight className="w-3 h-3 ml-1" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Unfinished Sync */}
-              <Card className="bg-card border-border shadow-sm">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm font-semibold text-foreground">Unfinished Sync</CardTitle>
-                    <Button variant="ghost" size="sm" className="w-6 h-6 p-0 hover:bg-accent">
-                      <MoreVertical className="w-3 h-3 text-muted-foreground" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {[
-                      { icon: FileText, title: 'Missing authorization', desc: 'Create an entry button is clicked', time: 'Edited 22 minutes ago' },
-                      { icon: Grid3X3, title: 'Missing authorization', desc: 'When new idea added in Table, create AI-generated ideas', time: 'Edited 3 days ago' },
-                      { icon: Hexagon, title: 'Incomplete action', desc: '', time: '' }
-                    ].map((item, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 border border-border rounded-lg hover:bg-accent transition-colors">
-                        <div className="flex items-center space-x-2">
-                          <item.icon className="w-4 h-4 text-muted-foreground" />
-                          <div>
-                            <div className="text-xs font-medium text-foreground">{item.title}</div>
-                            {item.desc && <div className="text-xs text-muted-foreground">{item.desc}</div>}
-                            {item.time && <div className="text-xs text-muted-foreground">{item.time}</div>}
-                          </div>
-                        </div>
-                        <Button variant="ghost" size="sm" className="w-6 h-6 p-0 hover:bg-destructive/10 hover:text-destructive">
-                          <Trash2 className="w-3 h-3" />
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex space-x-1 bg-muted/30 rounded-lg p-1">
+                      {['most-popular', 'trending', 'top-role'].map((tab) => (
+                        <Button 
+                          key={tab}
+                          variant={activeTab === tab ? 'default' : 'ghost'}
+                          size="sm"
+                          onClick={() => setActiveTab(tab)}
+                          className={`flex-1 text-xs h-8 ${activeTab === tab ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                          {tab === 'most-popular' ? 'Most popular' : 
+                           tab === 'trending' ? 'Trending' : 'Top by role'}
                         </Button>
+                      ))}
+                    </div>
+                    
+                    <div className="border border-border rounded-xl p-4 bg-gradient-to-br from-muted/20 to-muted/40 hover:from-muted/30 hover:to-muted/50 transition-all duration-300 cursor-pointer">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center text-white">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                          </svg>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-1 14H5c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v10c0 .55-.45 1-1 1z"/>
+                          </svg>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      <div className="text-sm text-foreground mb-2 font-medium">
+                        Save new Gmail emails matching certain traits to Google Drive
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs text-muted-foreground">Used by 12.5k users</div>
+                        <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-xs">Popular</Badge>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between pt-2">
+                      <Button variant="outline" size="sm" className="text-muted-foreground border-border">
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Previous
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-muted-foreground border-border">
+                        Next
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Unfinished Sync */}
+                <Card className="bg-card border-border shadow-lg">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center">
+                          <AlertTriangle className="w-4 h-4 text-primary-foreground" />
+                        </div>
+                        <CardTitle className="text-lg font-bold text-foreground">Issues & Warnings</CardTitle>
+                      </div>
+                      <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-accent">
+                        <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {[
+                        { icon: FileText, title: 'Missing authorization', desc: 'Create an entry button is clicked', time: '22 min ago', severity: 'warning' },
+                        { icon: Grid3X3, title: 'Incomplete workflow', desc: 'When new idea added in Table, create AI-generated ideas', time: '3 days ago', severity: 'warning' },
+                        { icon: Hexagon, title: 'Configuration error', desc: 'Canvas setup incomplete', time: '1 week ago', severity: 'error' }
+                      ].map((item, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-accent/30 transition-all duration-200 group">
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                              item.severity === 'error' ? 'bg-red-500/10' : 'bg-orange-500/10'
+                            }`}>
+                              <item.icon className={`w-4 h-4 ${
+                                item.severity === 'error' ? 'text-red-500' : 'text-orange-500'
+                              }`} />
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium text-foreground">{item.title}</div>
+                              {item.desc && <div className="text-xs text-muted-foreground">{item.desc}</div>}
+                              <div className="text-xs text-muted-foreground">{item.time}</div>
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-destructive/10 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </div>
