@@ -49,16 +49,16 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
 
   return (
     <div className={cn(
-      "bg-background/95 backdrop-blur-sm border-r border-border/50 flex flex-col transition-all duration-300",
+      "bg-card border-r border-border p-3 flex flex-col transition-all duration-300",
       isCollapsed ? "w-16" : "w-56"
     )}>
       {/* Header */}
-      <div className="p-3 border-b border-border/50">
+      <div className="mb-4">
         <div className={cn("flex items-center mb-3", isCollapsed ? "justify-center" : "gap-2")}>
           {!isCollapsed && (
             <>
-              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-sm">
-                <Sparkles className="w-3 h-3 text-white" />
+              <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+                <Sparkles className="w-3 h-3 text-primary-foreground" />
               </div>
               <div>
                 <h2 className="text-sm font-semibold text-foreground">n8n</h2>
@@ -66,8 +66,8 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             </>
           )}
           {isCollapsed && (
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-sm">
-              <Sparkles className="w-3 h-3 text-white" />
+            <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+              <Sparkles className="w-3 h-3 text-primary-foreground" />
             </div>
           )}
         </div>
@@ -78,17 +78,17 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             variant="ghost"
             size="sm"
             onClick={onToggleCollapse}
-            className="p-1.5 hover:bg-accent/30 rounded-md transition-colors"
+            className="w-6 h-6 p-0 hover:bg-accent"
           >
-            {isCollapsed ? <ChevronRight className="w-3 h-3" /> : <X className="w-3 h-3" />}
+            {isCollapsed ? <ChevronRight className="w-3 h-3 text-muted-foreground" /> : <X className="w-3 h-3 text-muted-foreground" />}
           </Button>
         </div>
 
         {!isCollapsed && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <div className="text-xs font-medium text-muted-foreground/80 uppercase tracking-wide">Navigation</div>
-              <Button variant="ghost" size="sm" className="h-5 px-1.5 text-xs hover:bg-accent/20">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Navigation</div>
+              <Button variant="ghost" size="sm" className="h-5 px-1.5 text-xs hover:bg-accent">
                 <Plus className="w-2.5 h-2.5" />
               </Button>
             </div>
@@ -97,7 +97,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
       </div>
 
       {/* Navigation Items */}
-      <div className="flex-1 p-3">
+      <div className="flex-1">
         <div className="space-y-1">
           {navigationItems.map((item) => {
             const Icon = item.icon;
@@ -106,17 +106,17 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                 key={item.id}
                 onClick={() => setActiveItem(item.id)}
                 className={cn(
-                  "w-full flex items-center gap-2 p-2 rounded-sm transition-all duration-150",
-                  "hover:bg-accent/10 hover:scale-[1.01] cursor-pointer group",
+                  "w-full flex items-center gap-2 p-2 rounded-lg transition-colors",
+                  "hover:bg-accent cursor-pointer",
                   activeItem === item.id 
-                    ? "bg-accent/20 text-accent-foreground border border-accent/30" 
+                    ? "bg-accent text-foreground" 
                     : "text-muted-foreground hover:text-foreground"
                 )}
                 title={isCollapsed ? item.label : undefined}
               >
                 <div className={cn(
-                  "p-1 rounded-sm flex items-center justify-center",
-                  activeItem === item.id ? "text-accent-foreground" : "text-muted-foreground group-hover:text-foreground"
+                  "flex items-center justify-center",
+                  activeItem === item.id ? "text-foreground" : "text-muted-foreground"
                 )}>
                   <Icon className="w-3 h-3" />
                 </div>
@@ -132,24 +132,24 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-border/50">
+      <div className="mt-4 pt-4 border-t border-border">
         {!isCollapsed ? (
           <div className="space-y-2">
-            <div className="text-xs text-muted-foreground/60 mb-2">Community Edition</div>
+            <div className="text-xs text-muted-foreground mb-2">Community Edition</div>
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span className="text-foreground/80">Executions</span>
-                <span className="text-foreground/60">0/∞</span>
+                <span className="text-foreground">Executions</span>
+                <span className="text-muted-foreground">0/∞</span>
               </div>
-              <div className="w-full bg-muted/20 rounded-full h-0.5">
-                <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-0.5 rounded-full transition-all duration-300" style={{ width: '0%' }} />
+              <div className="w-full bg-muted rounded-full h-1">
+                <div className="bg-primary h-1 rounded-full transition-all duration-300" style={{ width: '0%' }} />
               </div>
             </div>
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="w-6 h-0.5 bg-muted/20 rounded-full">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-0.5 rounded-full transition-all duration-300" style={{ width: '0%' }} />
+            <div className="w-6 h-1 bg-muted rounded-full">
+              <div className="bg-primary h-1 rounded-full transition-all duration-300" style={{ width: '0%' }} />
             </div>
           </div>
         )}

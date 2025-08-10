@@ -150,7 +150,7 @@ const CompactDraggableNode: React.FC<CompactDraggableNodeProps> = ({ nodeData })
       {...attributes}
       className={cn(
         "group cursor-grab active:cursor-grabbing select-none",
-        "p-2 rounded-sm border border-border/30 hover:bg-accent/20",
+        "p-2 rounded-lg border border-border hover:bg-accent",
         "transition-all duration-150 hover:scale-[1.02]",
         "border-l-2",
         getNodeColor(),
@@ -160,14 +160,14 @@ const CompactDraggableNode: React.FC<CompactDraggableNodeProps> = ({ nodeData })
     >
       <div className="flex items-center gap-2">
         <div className={cn(
-          "p-1 rounded-sm flex items-center justify-center",
+          "flex items-center justify-center",
           nodeData.type === 'trigger' && "text-blue-600",
           nodeData.type === 'action' && "text-purple-600"
         )}>
           <Zap className="w-3 h-3" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-foreground group-hover:text-accent-foreground transition-colors truncate">
+          <p className="text-xs font-medium text-foreground group-hover:text-foreground transition-colors truncate">
             {nodeData.label}
           </p>
         </div>
@@ -225,16 +225,16 @@ export const RightPanel: React.FC<RightPanelProps> = ({
 
   return (
     <div className={cn(
-      "bg-background/95 backdrop-blur-sm border-l border-border/50 flex flex-col transition-all duration-300",
+      "bg-card border-l border-border p-3 flex flex-col transition-all duration-300",
       isCollapsed ? "w-12" : "w-64"
     )}>
       {/* Header */}
-      <div className="p-3 border-b border-border/50">
+      <div className="mb-4">
         <div className={cn("flex items-center mb-3", isCollapsed ? "justify-center" : "gap-2")}>
           {!isCollapsed && (
             <>
-              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-sm">
-                <Sparkles className="w-3 h-3 text-white" />
+              <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+                <Sparkles className="w-3 h-3 text-primary-foreground" />
               </div>
               <div>
                 <h2 className="text-sm font-semibold text-foreground">Nodes</h2>
@@ -242,8 +242,8 @@ export const RightPanel: React.FC<RightPanelProps> = ({
             </>
           )}
           {isCollapsed && (
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-sm">
-              <Sparkles className="w-3 h-3 text-white" />
+            <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+              <Sparkles className="w-3 h-3 text-primary-foreground" />
             </div>
           )}
         </div>
@@ -254,9 +254,9 @@ export const RightPanel: React.FC<RightPanelProps> = ({
             variant="ghost"
             size="sm"
             onClick={onToggleCollapse}
-            className="p-1.5 hover:bg-accent/30 rounded-md transition-colors"
+            className="w-6 h-6 p-0 hover:bg-accent"
           >
-            {isCollapsed ? <ChevronLeft className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
+            <ChevronLeft className="w-3 h-3 text-muted-foreground" />
           </Button>
         </div>
 
@@ -264,12 +264,12 @@ export const RightPanel: React.FC<RightPanelProps> = ({
           <div className="space-y-3">
             {/* Search Input */}
             <div className="relative">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-muted-foreground/60" />
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-muted-foreground" />
               <Input
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-7 h-7 text-xs border-border/30 bg-background/50 focus:bg-background"
+                className="pl-7 h-7 text-xs border-border bg-background focus:bg-background"
               />
             </div>
 
@@ -277,7 +277,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
             {!selectedApp && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <div className="text-xs font-medium text-muted-foreground/80 uppercase tracking-wide">Start</div>
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Start</div>
                 </div>
                 <div className="space-y-1.5">
                   <CompactDraggableNode
@@ -291,8 +291,8 @@ export const RightPanel: React.FC<RightPanelProps> = ({
             {!selectedApp && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <div className="text-xs font-medium text-muted-foreground/80 uppercase tracking-wide">Apps</div>
-                  <Button variant="ghost" size="sm" className="h-5 px-1.5 text-xs hover:bg-accent/20">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Apps</div>
+                  <Button variant="ghost" size="sm" className="h-5 px-1.5 text-xs hover:bg-accent">
                     <Filter className="w-2.5 h-2.5 mr-1" />
                   </Button>
                 </div>
@@ -308,7 +308,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
                           setShowConfigPanel(false);
                         }}
                         className={cn(
-                          "w-full flex items-center gap-2 p-2 rounded-sm border border-border/20 bg-background/30 hover:bg-accent/10",
+                          "w-full flex items-center gap-2 p-2 rounded-lg border border-border bg-background hover:bg-accent",
                           "cursor-pointer transition-all duration-150 hover:scale-[1.01]",
                           "text-left group"
                         )}
@@ -316,7 +316,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
                         <div className={cn("p-1 rounded-sm", app.color)}>
                           <Icon className="w-3 h-3" />
                         </div>
-                        <span className="text-xs font-medium text-foreground group-hover:text-accent-foreground transition-colors truncate">
+                        <span className="text-xs font-medium text-foreground group-hover:text-foreground transition-colors truncate">
                           {appName}
                         </span>
                       </button>
@@ -335,7 +335,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
                   setSelectedApp(null);
                   setShowConfigPanel(true);
                 }}
-                className="w-full justify-start text-xs hover:bg-accent/20 h-6"
+                className="w-full justify-start text-xs hover:bg-accent h-6"
               >
                 ← Back
               </Button>
@@ -346,7 +346,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
 
       {/* Automation Blocks */}
       {!isCollapsed && selectedApp && (
-        <div className="flex-1 p-3">
+        <div className="flex-1">
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-2">
               {(() => {
@@ -362,7 +362,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
                 {selectedApp}
               </h3>
             </div>
-            <div className="text-xs text-muted-foreground/60">
+            <div className="text-xs text-muted-foreground">
               Drag to canvas
             </div>
           </div>
@@ -399,12 +399,12 @@ export const RightPanel: React.FC<RightPanelProps> = ({
 
       {/* Collapsed State - Show selected app icon */}
       {isCollapsed && selectedApp && (
-        <div className="flex-1 p-2">
+        <div className="flex-1">
           <div className="space-y-1.5">
             {allNodes.slice(0, 8).map((node) => (
               <div
                 key={node.id}
-                className="p-1.5 rounded-sm border border-border/20 bg-background/30 hover:bg-accent/10 cursor-grab transition-colors"
+                className="p-1.5 rounded-lg border border-border bg-background hover:bg-accent cursor-grab transition-colors"
                 title={node.label}
               >
                 <Zap className="w-2.5 h-2.5 mx-auto text-muted-foreground" />
@@ -415,15 +415,15 @@ export const RightPanel: React.FC<RightPanelProps> = ({
       )}
 
       {/* Footer */}
-      <div className="p-3 border-t border-border/50">
+      <div className="mt-4 pt-4 border-t border-border">
         {!isCollapsed ? (
-          <div className="text-xs text-muted-foreground/60 text-center">
+          <div className="text-xs text-muted-foreground text-center">
             n8n Community
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="w-6 h-0.5 bg-muted/20 rounded-full">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-0.5 rounded-full transition-all duration-300" style={{ width: '0%' }} />
+            <div className="w-6 h-1 bg-muted rounded-full">
+              <div className="bg-primary h-1 rounded-full transition-all duration-300" style={{ width: '0%' }} />
             </div>
           </div>
         )}

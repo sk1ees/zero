@@ -2,7 +2,9 @@
 import React, { useState } from 'react';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { 
-  Plus
+  Plus,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 import { NodeDragItem } from './NodeDragItem';
@@ -13,12 +15,14 @@ import { RightPanel } from './RightPanel';
 import { FlowCanvas } from './FlowCanvas';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
+import { useTheme } from '../theme-provider';
 
 export const N8nFlowEditor: React.FC = () => {
   const { addNode, setShowConfigPanel } = useAutomationStore();
   const [draggedItem, setDraggedItem] = useState<NodeData | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const handleDragStart = (nodeData: NodeData) => {
     setDraggedItem(nodeData);
@@ -81,7 +85,7 @@ export const N8nFlowEditor: React.FC = () => {
         {/* Main Canvas Area */}
         <div className="flex-1 flex flex-col">
           {/* Canvas Toolbar */}
-          <div className="h-10 border-b border-border bg-card/30 flex items-center justify-between px-4">
+          <div className="h-10 border-b border-border bg-card flex items-center justify-between px-4">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span>Zoom:</span>
@@ -98,14 +102,14 @@ export const N8nFlowEditor: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 px-2 text-xs"
+                className="h-6 px-2 text-xs hover:bg-accent"
               >
                 Fit View
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 px-2 text-xs"
+                className="h-6 px-2 text-xs hover:bg-accent"
               >
                 Center
               </Button>
@@ -118,6 +122,19 @@ export const N8nFlowEditor: React.FC = () => {
               >
                 <Plus className="w-3 h-3" />
                 Add
+              </Button>
+              <Separator orientation="vertical" className="h-4" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleTheme}
+                className="h-6 w-6 p-0 hover:bg-accent"
+              >
+                {theme === 'light' ? (
+                  <Moon className="w-3 h-3 text-muted-foreground" />
+                ) : (
+                  <Sun className="w-3 h-3 text-muted-foreground" />
+                )}
               </Button>
             </div>
           </div>

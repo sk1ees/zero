@@ -15,13 +15,16 @@ import {
   Download,
   Upload,
   Share2,
-  Settings
+  Settings,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
 import { N8nFlowEditor } from '../../components/FlowEditor/N8nFlowEditor';
+import { useTheme } from '../../components/theme-provider';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -32,6 +35,7 @@ import {
 
 const FlowPage = () => {
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
   const [workflowName, setWorkflowName] = useState('Untitled Workflow');
   const [isEditingName, setIsEditingName] = useState(false);
   const [showMiniMap, setShowMiniMap] = useState(true);
@@ -39,36 +43,36 @@ const FlowPage = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Workflow Editor Header */}
-      <div className="h-14 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between px-4">
+      <div className="h-12 border-b border-border bg-card flex items-center justify-between px-4">
         {/* Left Section */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {/* Back Button */}
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className="h-7 w-7 p-0 hover:bg-accent"
             onClick={() => router.push('/flow')}
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5" />
           </Button>
           
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Home className="w-4 h-4" />
-            <ChevronRight className="w-3 h-3" />
-            <Workflow className="w-4 h-4" />
-            <ChevronRight className="w-3 h-3" />
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Home className="w-3 h-3" />
+            <ChevronRight className="w-2.5 h-2.5" />
+            <Workflow className="w-3 h-3" />
+            <ChevronRight className="w-2.5 h-2.5" />
             <span 
               className="text-foreground hover:text-primary cursor-pointer transition-colors"
               onClick={() => router.push('/flow')}
             >
               Workflows
             </span>
-            <ChevronRight className="w-3 h-3" />
+            <ChevronRight className="w-2.5 h-2.5" />
             <span className="text-foreground">{workflowName}</span>
           </div>
           
-          <Separator orientation="vertical" className="h-6" />
+          <Separator orientation="vertical" className="h-4" />
           
           {/* Workflow Name */}
           <div className="flex items-center gap-2">
@@ -81,27 +85,27 @@ const FlowPage = () => {
                   if (e.key === 'Enter') setIsEditingName(false);
                   if (e.key === 'Escape') setIsEditingName(false);
                 }}
-                className="h-8 w-48 text-sm font-medium"
+                className="h-7 w-40 text-xs font-medium"
                 autoFocus
               />
             ) : (
               <button
                 onClick={() => setIsEditingName(true)}
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                className="text-xs font-medium text-foreground hover:text-primary transition-colors"
               >
                 {workflowName}
               </button>
             )}
-            <Badge variant="secondary" className="text-xs">Draft</Badge>
+            <Badge variant="secondary" className="text-xs px-1.5 py-0.5">Draft</Badge>
           </div>
         </div>
 
         {/* Center Section - Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Button
             variant="outline"
             size="sm"
-            className="h-8 gap-2"
+            className="h-7 gap-1.5 text-xs"
           >
             <Eye className="w-3 h-3" />
             Preview
@@ -110,7 +114,7 @@ const FlowPage = () => {
           <Button
             variant="outline"
             size="sm"
-            className="h-8 gap-2"
+            className="h-7 gap-1.5 text-xs"
           >
             <Save className="w-3 h-3" />
             Save
@@ -118,7 +122,7 @@ const FlowPage = () => {
           
           <Button
             size="sm"
-            className="h-8 gap-2"
+            className="h-7 gap-1.5 text-xs"
           >
             <Play className="w-3 h-3" />
             Execute
@@ -126,14 +130,27 @@ const FlowPage = () => {
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className="h-7 w-7 p-0 hover:bg-accent"
             onClick={() => setShowMiniMap(!showMiniMap)}
           >
-            {showMiniMap ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            {showMiniMap ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleTheme}
+            className="h-7 w-7 p-0 hover:bg-accent"
+          >
+            {theme === 'light' ? (
+              <Moon className="w-3.5 h-3.5 text-muted-foreground" />
+            ) : (
+              <Sun className="w-3.5 h-3.5 text-muted-foreground" />
+            )}
           </Button>
           
           <DropdownMenu>
@@ -141,9 +158,9 @@ const FlowPage = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0"
+                className="h-7 w-7 p-0 hover:bg-accent"
               >
-                <MoreHorizontal className="h-4 w-4" />
+                <MoreHorizontal className="h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
