@@ -11,11 +11,13 @@ import { ConfigPanel } from './ConfigPanel';
 import { FlowCanvas } from './FlowCanvas';
 import { Button } from '../ui/button';
 import { useTheme } from '../theme-provider';
+import { RightPanel } from './RightPanel';
 
 export const AutomationBuilder: React.FC = () => {
   const { addNode } = useAutomationStore();
   const [draggedItem, setDraggedItem] = React.useState<NodeData | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
   const handleDragStart = (nodeData: NodeData) => {
@@ -124,6 +126,12 @@ export const AutomationBuilder: React.FC = () => {
             <FlowCanvas />
           </div>
         </div>
+
+        {/* Nodes Right Panel */}
+        <RightPanel
+          isCollapsed={isRightPanelCollapsed}
+          onToggleCollapse={() => setIsRightPanelCollapsed(!isRightPanelCollapsed)}
+        />
 
         {/* Right Configuration Panel */}
         <ConfigPanel />

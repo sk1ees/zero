@@ -31,8 +31,8 @@ export const ConditionalEdge: React.FC<ConditionalEdgeProps> = ({
   });
 
   const sourceHandle = data?.sourceHandle;
-  const isSuccess = sourceHandle === 'success';
-  const isError = sourceHandle === 'error';
+  const isSuccess = sourceHandle === 'success' || sourceHandle === 'true';
+  const isError = sourceHandle === 'error' || sourceHandle === 'false';
 
   const edgeColor = isSuccess 
     ? '#10b981' // green-500
@@ -40,7 +40,12 @@ export const ConditionalEdge: React.FC<ConditionalEdgeProps> = ({
     ? '#ef4444' // red-500
     : '#6b7280'; // gray-500
 
-  const labelText = isSuccess ? 'Success' : isError ? 'Error' : '';
+  const labelText = sourceHandle === 'true' ? 'True' 
+    : sourceHandle === 'false' ? 'False' 
+    : sourceHandle === 'success' ? 'Success' 
+    : sourceHandle === 'error' ? 'Error' 
+    : '';
+
   const labelBgColor = isSuccess 
     ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
     : isError 
@@ -56,7 +61,7 @@ export const ConditionalEdge: React.FC<ConditionalEdgeProps> = ({
           ...style, 
           stroke: edgeColor,
           strokeWidth: 2,
-          strokeDasharray: isError ? '5,5' : undefined
+          strokeDasharray: sourceHandle === 'error' || sourceHandle === 'false' ? '5,5' : undefined
         }} 
       />
       {labelText && (

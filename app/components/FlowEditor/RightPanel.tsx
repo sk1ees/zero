@@ -19,12 +19,25 @@ import {
   Users,
   Settings,
   BarChart3,
-  Play
+  Play,
+  GitBranch
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { NodeData, useAutomationStore } from '../../stores/automationStore';
 import { cn } from '@/lib/utils';
+
+// Predefined core nodes not tied to apps
+const conditionNodes: NodeData[] = [
+  { id: 'if-else', type: 'condition', label: 'If / Else', icon: 'GitBranch' },
+];
+
+const utilityNodes: NodeData[] = [
+  { id: 'http-request', type: 'action', label: 'HTTP Request', icon: 'Zap' },
+  { id: 'delay', type: 'action', label: 'Delay', icon: 'Zap' },
+  { id: 'code', type: 'action', label: 'Run Code', icon: 'Zap' },
+  { id: 'loop', type: 'action', label: 'Loop / For Each', icon: 'Zap' },
+];
 
 // Compact automation apps with their triggers and actions
 const automationApps = {
@@ -138,6 +151,8 @@ const CompactDraggableNode: React.FC<CompactDraggableNodeProps> = ({ nodeData })
         return 'border-l-blue-500 bg-blue-50/50 dark:bg-blue-950/20';
       case 'action':
         return 'border-l-purple-500 bg-purple-50/50 dark:bg-purple-950/20';
+      case 'condition':
+        return 'border-l-orange-500 bg-orange-50/50 dark:bg-orange-950/20';
       default:
         return 'border-l-gray-500 bg-gray-50/50 dark:bg-gray-950/20';
     }
@@ -162,7 +177,8 @@ const CompactDraggableNode: React.FC<CompactDraggableNodeProps> = ({ nodeData })
         <div className={cn(
           "flex items-center justify-center",
           nodeData.type === 'trigger' && "text-blue-600",
-          nodeData.type === 'action' && "text-purple-600"
+          nodeData.type === 'action' && "text-purple-600",
+          nodeData.type === 'condition' && "text-orange-600",
         )}>
           <Zap className="w-3 h-3" />
         </div>
@@ -283,6 +299,34 @@ export const RightPanel: React.FC<RightPanelProps> = ({
                   <CompactDraggableNode
                     nodeData={{ id: 'start-node', type: 'start', label: 'Start', icon: 'Play' }}
                   />
+                </div>
+              </div>
+            )}
+
+            {/* Conditions Category */}
+            {!selectedApp && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Conditions</div>
+                </div>
+                <div className="space-y-1.5">
+                  {conditionNodes.map((node) => (
+                    <CompactDraggableNode key={node.id} nodeData={node} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Utilities Category */}
+            {!selectedApp && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Utilities</div>
+                </div>
+                <div className="space-y-1.5">
+                  {utilityNodes.map((node) => (
+                    <CompactDraggableNode key={node.id} nodeData={node} />
+                  ))}
                 </div>
               </div>
             )}

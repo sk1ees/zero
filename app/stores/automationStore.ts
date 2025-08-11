@@ -183,7 +183,12 @@ export const useAutomationStore = create<FlowState>((set, get) => ({
       edges: addEdge(
         {
           ...connection,
-          type: 'smoothstep',
+          type: (
+            connection.sourceHandle === 'success' ||
+            connection.sourceHandle === 'error' ||
+            connection.sourceHandle === 'true' ||
+            connection.sourceHandle === 'false'
+          ) ? 'conditional' : 'smoothstep',
           animated: true,
           style: { stroke: '#3b82f6', strokeWidth: 3 },
           data: { sourceHandle: connection.sourceHandle },

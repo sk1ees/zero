@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Mail, Trello, Database, Zap, MoreHorizontal, Play, Edit, Copy, AlertTriangle, Trash2 } from 'lucide-react';
+import { Mail, Trello, Database, Zap, MoreHorizontal, Play, Edit, Copy, AlertTriangle, Trash2, GitBranch } from 'lucide-react';
 import { NodeData, useAutomationStore } from '../../stores/automationStore';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -16,7 +16,8 @@ const iconMap = {
   Trello,
   Database,
   Zap,
-  Play
+  Play,
+  GitBranch
 };
 
 interface AutomationNodeProps {
@@ -126,6 +127,100 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
   const wrapperColorClass = getWrapperColor();
   const iconColorClass = getIconColor();
   const handleColor = getHandleColor();
+
+  // Specialized diamond rendering for condition nodes
+  if (data.type === 'condition') {
+    return (
+      <div className={`relative ${selected ? 'ring-2 ring-primary ring-offset-2 shadow-xl' : 'hover:shadow-md'}`}>
+        {/* Input handle on top */}
+        <Handle
+          type="target"
+          position={Position.Top}
+          id="target"
+          className={`w-3 h-3 border-2 ${handleColor} hover:scale-110 transition-transform`}
+          style={{ zIndex: 1000 }}
+        />
+
+        {/* Diamond body */}
+        <div
+          className={`relative w-36 h-36 bg-card border-2 ${wrapperColorClass} rounded-md shadow-lg rotate-45 flex items-center justify-center`}
+        >
+          {/* Counter-rotate the content so text is readable */}
+          <div className="-rotate-45 p-3 text-center select-none">
+            <div className={`mx-auto mb-2 inline-flex p-2 rounded-lg ${iconColorClass}`}>
+              <IconComponent className="w-4 h-4" />
+            </div>
+            {isRenaming ? (
+              <Input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                onBlur={handleRename}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleRename();
+                  if (e.key === 'Escape') {
+                    setNewName(data.label);
+                    setIsRenaming(false);
+                  }
+                }}
+                className="h-6 text-sm font-medium bg-background"
+                autoFocus
+              />
+            ) : (
+              <h3 className="font-semibold text-foreground text-sm truncate max-w-[120px] mx-auto">{data.label}</h3>
+            )}
+            <p className="text-xs text-muted-foreground capitalize">{data.type}</p>
+          </div>
+
+          {/* Context menu button (top-right in visual coordinates) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="absolute -top-2 -right-2 -rotate-45 h-7 w-7 p-0 opacity-60 hover:opacity-100">
+                <MoreHorizontal className="w-3 h-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => setIsRenaming(true)}>
+                <Edit className="w-4 h-4 mr-2" />
+                Rename
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDuplicate}>
+                <Copy className="w-4 h-4 mr-2" />
+                Duplicate
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleAddErrorHandler}>
+                <AlertTriangle className="w-4 h-4 mr-2" />
+                Add error handler
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-destructive" onClick={handleDelete}>
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Output handles left/right */}
+        <Handle
+          type="source"
+          position={Position.Left}
+          id="false"
+          className="w-3 h-3 border-2 bg-red-500 border-red-200 dark:border-red-800 hover:scale-110 transition-transform"
+          style={{ zIndex: 1000, top: '50%', transform: 'translateY(-50%)' }}
+        />
+        <Handle
+          type="source"
+          position={Position.Right}
+          id="true"
+          className="w-3 h-3 border-2 bg-green-500 border-green-200 dark:border-green-800 hover:scale-110 transition-transform"
+          style={{ zIndex: 1000, top: '50%', transform: 'translateY(-50%)' }}
+        />
+
+        {/* Labels next to outputs */}
+        <div className="absolute left-[-28px] top-1/2 -translate-y-1/2 text-xs text-red-600 dark:text-red-400 font-medium">False</div>
+        <div className="absolute right-[-28px] top-1/2 -translate-y-1/2 text-xs text-green-600 dark:text-green-400 font-medium">True</div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -239,8 +334,8 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
           )}
         </div>
 
-        {/* Output Handles for Actions/Conditions */}
-        {(data.type === 'action' || data.type === 'condition') && (
+        {/* Output Handles for Actions */}
+        {data.type === 'action' && (
           <>
             <Handle
               type="source"
@@ -256,8 +351,6 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
               className="w-3 h-3 border-2 bg-red-500 border-red-200 dark:border-red-800 hover:scale-110 transition-transform"
               style={{ left: '60%', zIndex: 1000 }}
             />
-
-            {/* Success/Error Labels */}
             <div className="absolute -bottom-6 left-0 right-0 flex justify-center gap-8">
               <div className="text-xs text-green-600 dark:text-green-400 font-medium">Success</div>
               <div className="text-xs text-red-600 dark:text-red-400 font-medium">Error</div>
