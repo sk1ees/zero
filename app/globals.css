@@ -208,10 +208,63 @@
 
 .react-flow__edge {
   transition: stroke-width 0.2s ease;
+  z-index: 100 !important;
 }
 
 .react-flow__edge:hover {
   stroke-width: 3;
+}
+
+.react-flow__edge-path {
+  z-index: 100 !important;
+  pointer-events: all !important;
+}
+
+.react-flow__connection-line {
+  z-index: 1000 !important;
+  pointer-events: all !important;
+  stroke: hsl(var(--primary)) !important;
+  stroke-width: 3 !important;
+}
+
+.react-flow__connection-line-path {
+  z-index: 1000 !important;
+  pointer-events: all !important;
+  stroke: hsl(var(--primary)) !important;
+  stroke-width: 3 !important;
+}
+
+.react-flow__connection {
+  z-index: 1000 !important;
+  pointer-events: all !important;
+}
+
+/* Ensure connection line is visible during connection */
+.react-flow__connection-line,
+.react-flow__connection-line-path {
+  stroke: hsl(var(--primary)) !important;
+  stroke-width: 3 !important;
+  z-index: 1000 !important;
+  pointer-events: all !important;
+}
+
+/* Make sure handles are visible and clickable */
+.react-flow__handle {
+  z-index: 1000 !important;
+  pointer-events: all !important;
+}
+
+/* Ensure the connection line appears above everything */
+.react-flow__pane {
+  z-index: 1 !important;
+}
+
+.react-flow__edges {
+  z-index: 100 !important;
+}
+
+.react-flow__connection-line {
+  z-index: 1000 !important;
 }
 
 .react-flow__controls {
@@ -226,6 +279,17 @@
 .react-flow__pane,
 .react-flow__background {
   background: transparent !important;
+}
+
+/* Ensure ReactFlow container has proper stacking context */
+.react-flow {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.react-flow__viewport {
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 /* Scrollbar styling */

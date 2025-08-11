@@ -130,19 +130,24 @@ export const useAutomationStore = create<FlowState>((set, get) => ({
   },
 
   onConnect: (connection) => {
+    // Only create connection if we have valid source and target
+    if (!connection.source || !connection.target) {
+      return;
+    }
+
     set((state) => {
       // Create a new edge with proper styling
       const newEdge: Edge = {
         id: `edge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        source: connection.source!,
-        target: connection.target!,
-        sourceHandle: connection.sourceHandle,
-        targetHandle: connection.targetHandle,
+        source: connection.source,
+        target: connection.target,
+        sourceHandle: connection.sourceHandle || null,
+        targetHandle: connection.targetHandle || null,
         type: 'smoothstep',
         animated: true,
         style: {
-          stroke: 'hsl(var(--primary))',
-          strokeWidth: 2,
+          stroke: '#3b82f6',
+          strokeWidth: 3,
         },
         data: { sourceHandle: connection.sourceHandle }
       };

@@ -34,16 +34,16 @@ const edgeTypes = {
 // Custom edge styles
 const getEdgeStyle = (edge: Edge) => {
   const baseStyle = {
-    strokeWidth: 2,
-    stroke: 'hsl(var(--primary))',
+    strokeWidth: 3,
+    stroke: '#3b82f6',
   };
 
   if (edge.type === 'conditional') {
     return {
       ...baseStyle,
       stroke: edge.data?.sourceHandle === 'success'
-        ? 'hsl(var(--success))'
-        : 'hsl(var(--destructive))',
+        ? '#10b981'
+        : '#ef4444',
       strokeDasharray: '5,5',
     };
   }
@@ -91,12 +91,15 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
     type: edge.type || 'smoothstep',
   }));
 
+
+
   return (
     <div className="flex-1 relative" style={{ height: '100%', minHeight: '500px' }}>
       <div
         ref={setNodeRef}
         id="flow-canvas"
-        className="w-full h-full"
+        className="w-full h-full relative z-0"
+        style={{ position: 'relative', zIndex: 0 }}
       >
         <ReactFlowProvider>
           <ReactFlow
@@ -122,11 +125,21 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
             nodesConnectable={true}
             elementsSelectable={true}
             connectionLineStyle={{
-              stroke: 'hsl(var(--primary))',
-              strokeWidth: 2,
+              stroke: '#3b82f6',
+              strokeWidth: 3,
             }}
-            connectionLineType={ConnectionLineType.SmoothStep}
+            connectionLineType={ConnectionLineType.Straight}
+
             style={{ background: 'transparent' }}
+            deleteKeyCode="Delete"
+            multiSelectionKeyCode="Shift"
+            panOnDrag={true}
+            panOnScroll={false}
+            zoomOnScroll={true}
+            zoomOnPinch={true}
+            zoomOnDoubleClick={false}
+            preventScrolling={true}
+            attributionPosition="bottom-left"
           >
             <Background
               variant={BackgroundVariant.Lines}

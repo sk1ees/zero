@@ -140,7 +140,9 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
           <Handle
             type="target"
             position={Position.Top}
+            id="target"
             className={`w-3 h-3 border-2 ${handleColor} hover:scale-110 transition-transform`}
+            style={{ zIndex: 1000 }}
           />
         )}
 
@@ -244,14 +246,14 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
               position={Position.Bottom}
               id="success"
               className="w-3 h-3 border-2 bg-green-500 border-green-200 dark:border-green-800 hover:scale-110 transition-transform"
-              style={{ left: '40%' }}
+              style={{ left: '40%', zIndex: 1000 }}
             />
             <Handle
               type="source"
               position={Position.Bottom}
               id="error"
               className="w-3 h-3 border-2 bg-red-500 border-red-200 dark:border-red-800 hover:scale-110 transition-transform"
-              style={{ left: '60%' }}
+              style={{ left: '60%', zIndex: 1000 }}
             />
 
             {/* Success/Error Labels */}
@@ -267,7 +269,9 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
           <Handle
             type="source"
             position={Position.Bottom}
+            id="source"
             className={`w-3 h-3 border-2 ${handleColor} hover:scale-110 transition-transform`}
+            style={{ zIndex: 1000 }}
           />
         )}
       </div>
