@@ -131,7 +131,8 @@ export const AutomationNode: React.FC<AutomationNodeProps> = ({
     <>
       <div className={`
         relative bg-card border-2 rounded-xl shadow-lg
-        transition-all duration-200 min-w-[220px] max-w-[280px]
+        min-w-[220px] max-w-[280px]
+        transition-shadow transition-colors duration-200
         ${selected ? 'ring-2 ring-primary ring-offset-2 shadow-xl' : 'hover:shadow-md'}
         ${wrapperColorClass}
       `}>

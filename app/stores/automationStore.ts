@@ -1,5 +1,14 @@
 import { create } from 'zustand';
-import { Node, Edge, Connection, NodeChange, EdgeChange } from '@xyflow/react';
+import {
+  Node,
+  Edge,
+  Connection,
+  NodeChange,
+  EdgeChange,
+  applyNodeChanges,
+  applyEdgeChanges,
+  addEdge
+} from '@xyflow/react';
 
 export interface NodeConfig {
   method?: string;
@@ -41,6 +50,31 @@ export interface FlowState {
 
 let nodeIdCounter = 0;
 
+// Throttle frequent drag position updates into rAF to avoid update-depth loops under heavy interaction
+let pendingNodeChanges: NodeChange[] = [];
+let rafScheduled: number | null = null;
+
+function getNodeChangeKey(change: NodeChange): string | null {
+  const c: any = change as any;
+  if (c && typeof c.id === 'string') return c.id as string;
+  if (c && c.item && typeof c.item.id === 'string') return c.item.id as string;
+  return null;
+}
+
+function mergeNodeChangesById(changes: NodeChange[]): NodeChange[] {
+  const map = new Map<string, NodeChange>();
+  const passthrough: NodeChange[] = [];
+  for (const change of changes) {
+    const key = getNodeChangeKey(change);
+    if (!key) {
+      passthrough.push(change);
+      continue;
+    }
+    map.set(key, change);
+  }
+  return [...passthrough, ...Array.from(map.values())];
+}
+
 export const useAutomationStore = create<FlowState>((set, get) => ({
   nodes: [],
   edges: [],
@@ -52,7 +86,18 @@ export const useAutomationStore = create<FlowState>((set, get) => ({
 
   addNode: (node) => {
     set((state) => ({
-      nodes: [...state.nodes, node]
+      nodes: [...state.nodes, {
+        ...node,
+        // Ensure the node has all required properties for React Flow
+        id: node.id,
+        position: node.position || { x: 0, y: 0 },
+        data: node.data,
+        type: node.type || 'automation',
+        // Ensure these properties are set for proper React Flow initialization
+        draggable: true,
+        selectable: true,
+        deletable: true
+      }]
     }));
   },
 
@@ -81,79 +126,71 @@ export const useAutomationStore = create<FlowState>((set, get) => ({
   setShowConfigPanel: (show) => set({ showConfigPanel: show }),
 
   onNodesChange: (changes) => {
-    set((state) => {
-      const updatedNodes = [...state.nodes];
+    // Batch frequent drag changes into a single rAF update for performance
+    pendingNodeChanges.push(...changes);
+    if (rafScheduled != null) return;
+    rafScheduled = window.requestAnimationFrame(() => {
+      const batched = mergeNodeChangesById(pendingNodeChanges);
+      pendingNodeChanges = [];
+      rafScheduled = null;
 
-      changes.forEach((change) => {
-        if (change.type === 'position' && change.position) {
-          const nodeIndex = updatedNodes.findIndex((n) => n.id === change.id);
-          if (nodeIndex !== -1) {
-            updatedNodes[nodeIndex] = {
-              ...updatedNodes[nodeIndex],
-              position: change.position
-            };
-          }
-        } else if (change.type === 'select') {
-          const nodeIndex = updatedNodes.findIndex((n) => n.id === change.id);
-          if (nodeIndex !== -1) {
-            updatedNodes[nodeIndex] = {
-              ...updatedNodes[nodeIndex],
-              selected: change.selected
-            };
-
-            if (change.selected) {
-              set({ selectedNode: updatedNodes[nodeIndex], showConfigPanel: true });
+      set((state) => {
+        const nextNodes = applyNodeChanges(batched, state.nodes) as Node<NodeData>[];
+        const hasSelectChange = batched.some((c) => c.type === 'select');
+        let nextSelectedNode = state.selectedNode;
+        let nextShowConfigPanel = state.showConfigPanel;
+        if (hasSelectChange) {
+          for (const change of batched) {
+            if (change.type === 'select') {
+              const changedNode = nextNodes.find((n) => n.id === change.id);
+              if (change.selected && changedNode) {
+                nextSelectedNode = changedNode as Node<NodeData>;
+                nextShowConfigPanel = true;
+              }
             }
           }
-        } else if (change.type === 'remove') {
-          get().removeNode(change.id);
-          return;
+          if (!nextNodes.some((n) => n.selected)) {
+            nextSelectedNode = null;
+            nextShowConfigPanel = false;
+          }
         }
-      });
 
-      return { nodes: updatedNodes };
+        const hasNodeRemoval = batched.some((c) => c.type === 'remove');
+        const partial: Partial<FlowState> = { nodes: nextNodes };
+        if (hasNodeRemoval) {
+          const nextNodeIds = new Set(nextNodes.map((n) => n.id));
+          partial.edges = state.edges.filter(
+            (e) => nextNodeIds.has(e.source) && nextNodeIds.has(e.target)
+          );
+        }
+        if (hasSelectChange) {
+          partial.selectedNode = nextSelectedNode;
+          partial.showConfigPanel = nextShowConfigPanel;
+        }
+
+        return partial;
+      });
     });
   },
 
   onEdgesChange: (changes) => {
-    set((state) => {
-      let updatedEdges = [...state.edges];
-
-      changes.forEach((change) => {
-        if (change.type === 'remove') {
-          updatedEdges = updatedEdges.filter((edge) => edge.id !== change.id);
-        }
-      });
-
-      return { edges: updatedEdges };
-    });
+    set((state) => ({ edges: applyEdgeChanges(changes, state.edges) }));
   },
 
   onConnect: (connection) => {
-    // Only create connection if we have valid source and target
-    if (!connection.source || !connection.target) {
-      return;
-    }
-
-    set((state) => {
-      // Create a new edge with proper styling
-      const newEdge: Edge = {
-        id: `edge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        source: connection.source,
-        target: connection.target,
-        sourceHandle: connection.sourceHandle || null,
-        targetHandle: connection.targetHandle || null,
-        type: 'smoothstep',
-        animated: true,
-        style: {
-          stroke: '#3b82f6',
-          strokeWidth: 3,
+    if (!connection.source || !connection.target) return;
+    set((state) => ({
+      edges: addEdge(
+        {
+          ...connection,
+          type: 'smoothstep',
+          animated: true,
+          style: { stroke: '#3b82f6', strokeWidth: 3 },
+          data: { sourceHandle: connection.sourceHandle },
         },
-        data: { sourceHandle: connection.sourceHandle }
-      };
-
-      return { edges: [...state.edges, newEdge] };
-    });
+        state.edges
+      ),
+    }));
   }
 }));
 

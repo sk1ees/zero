@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
   ReactFlow,
@@ -11,8 +11,7 @@ import {
   Edge,
   Connection,
   Node,
-  ConnectionLineType,
-  ReactFlowProvider
+  ConnectionLineType
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { NodeData, useAutomationStore } from '../../stores/automationStore';
@@ -34,17 +33,16 @@ const edgeTypes = {
 // Custom edge styles
 const getEdgeStyle = (edge: Edge) => {
   const baseStyle = {
-    strokeWidth: 3,
+    strokeWidth: 2,
     stroke: '#3b82f6',
+    strokeDasharray: '4 4',
   };
 
   if (edge.type === 'conditional') {
     return {
       ...baseStyle,
-      stroke: edge.data?.sourceHandle === 'success'
-        ? '#10b981'
-        : '#ef4444',
-      strokeDasharray: '5,5',
+      stroke: edge.data?.sourceHandle === 'success' ? '#10b981' : '#ef4444',
+      strokeDasharray: '6 3',
     };
   }
 
@@ -83,13 +81,19 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
     onConnect(connection);
   }, [onConnect]);
 
-  // Apply custom styles to edges
-  const styledEdges = edges.map(edge => ({
-    ...edge,
-    style: getEdgeStyle(edge),
-    animated: true,
-    type: edge.type || 'smoothstep',
-  }));
+  // Avoid extra writes during drag; React Flow internal state already tracks position.
+  const handleNodeDrag = useCallback(() => {}, []);
+  const handleNodeDragStop = useCallback(() => {}, []);
+
+  // Apply custom styles to edges (memoized to avoid identity churn)
+  const styledEdges = useMemo(() => (
+    edges.map(edge => ({
+      ...edge,
+      style: getEdgeStyle(edge),
+      animated: false,
+      type: edge.type || 'smoothstep',
+    }))
+  ), [edges]);
 
 
 
@@ -101,7 +105,6 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
         className="w-full h-full relative z-0"
         style={{ position: 'relative', zIndex: 0 }}
       >
-        <ReactFlowProvider>
           <ReactFlow
             nodes={nodes}
             edges={styledEdges}
@@ -110,11 +113,12 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
             onConnect={handleConnect}
             onNodeClick={handleNodeClick}
             onPaneClick={handlePaneClick}
+            onNodeDrag={handleNodeDrag}
+            onNodeDragStop={handleNodeDragStop}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             connectionMode={ConnectionMode.Loose}
             fitView
-            className=""
             defaultViewport={{ x: 0, y: 0, zoom: 1 }}
             minZoom={0.5}
             maxZoom={2}
@@ -124,12 +128,8 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
             nodesDraggable={true}
             nodesConnectable={true}
             elementsSelectable={true}
-            connectionLineStyle={{
-              stroke: '#3b82f6',
-              strokeWidth: 3,
-            }}
+            connectionLineStyle={{ stroke: '#3b82f6', strokeWidth: 2, strokeDasharray: '4 4' }}
             connectionLineType={ConnectionLineType.Straight}
-
             style={{ background: 'transparent' }}
             deleteKeyCode="Delete"
             multiSelectionKeyCode="Shift"
@@ -140,6 +140,13 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
             zoomOnDoubleClick={false}
             preventScrolling={true}
             attributionPosition="bottom-left"
+            // Ensure proper node initialization
+            onInit={(reactFlowInstance) => {
+              // Force a re-render to ensure all nodes are properly initialized
+              // Avoid expensive fitView on init as it can trigger extra reflows while dragging
+              // reactFlowInstance.fitView();
+            }}
+
           >
             <Background
               variant={BackgroundVariant.Lines}
@@ -183,7 +190,6 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({ showMiniMap = true }) =>
               </Panel>
             )}
           </ReactFlow>
-        </ReactFlowProvider>
       </div>
     </div>
   );

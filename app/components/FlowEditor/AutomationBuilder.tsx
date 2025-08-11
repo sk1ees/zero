@@ -44,20 +44,27 @@ export const AutomationBuilder: React.FC = () => {
           }
         }
 
+        const nodeId = generateNodeId();
         const newNode: Node<NodeData> = {
-          id: generateNodeId(),
-          type: 'automation',
+          id: nodeId,
+          type: 'automation', // This is the React Flow node type for rendering
           position: { x: Math.max(50, x), y: Math.max(50, y) },
           data: {
             ...draggedItem,
-            id: generateNodeId(),
+            id: nodeId,
+            // Ensure the data.type is preserved from the dragged item
+            type: draggedItem.type,
             config: {
               method: 'GET',
               url: '',
               queryParams: [],
               description: ''
             }
-          }
+          },
+          // Ensure all required React Flow properties are set
+          draggable: true,
+          selectable: true,
+          deletable: true
         };
 
         addNode(newNode);
