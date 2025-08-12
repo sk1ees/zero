@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { 
   Plus, 
   Search, 
@@ -59,28 +59,28 @@ import {
   Archive,
   Tag
 } from 'lucide-react';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Badge } from '../../components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Separator } from '../../components/ui/separator';
-import { ThemeToggle } from '../../components/theme-toggle';
-import SearchDialog from '../../components/SearchDialog';
+import { Button } from '../../../../components/ui/button';
+import { Input } from '../../../../components/ui/input';
+import { Badge } from '../../../../components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
+import { Separator } from '../../../../components/ui/separator';
+import { ThemeToggle } from '../../../../components/theme-toggle';
+import SearchDialog from '../../../../components/SearchDialog';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
-} from '../../components/ui/dropdown-menu';
+} from '../../../../components/ui/dropdown-menu';
 import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../components/ui/select';
-import { Textarea } from '../../components/ui/textarea';
+} from '../../../../components/ui/select';
+import { Textarea } from '../../../../components/ui/textarea';
 
 // Mock templates
 const workflowTemplates = [
@@ -148,6 +148,8 @@ const workflowTemplates = [
 
 const CreateWorkflowPage = () => {
   const router = useRouter();
+  const { workspace_id } = useParams();
+  const workspaceId = (workspace_id as string) || '';
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [workflowName, setWorkflowName] = useState('');
@@ -168,7 +170,7 @@ const CreateWorkflowPage = () => {
     if (selectedTemplate && workflowName.trim()) {
       // Generate a random ID for the new workflow
       const newId = Math.floor(Math.random() * 1000000).toString();
-      router.push(`/flow/${newId}`);
+      router.push(`/w/${workspaceId}/f/${newId}`);
     }
   };
 
@@ -247,7 +249,7 @@ const CreateWorkflowPage = () => {
         {/* Create Button */}
         <Button 
           className={`${sidebarCollapsed ? 'w-6 h-6 p-0' : 'w-full h-8'} bg-primary hover:bg-primary/90 text-primary-foreground mb-4 shadow-sm flex items-center justify-center text-xs`}
-          onClick={() => router.push('/flow/new')}
+          onClick={() => router.push(`/w/${workspaceId}/f/new`)}
         >
           <Plus className="w-3 h-3" />
           {!sidebarCollapsed && <span className="ml-1">Create</span>}
@@ -257,7 +259,7 @@ const CreateWorkflowPage = () => {
         <div className="space-y-1 mb-4">
           <div 
             className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-2'} p-2 text-muted-foreground hover:bg-accent rounded-lg cursor-pointer transition-colors`}
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.push(`/w/${workspaceId}`)}
           >
             <Gauge className="w-3 h-3" />
             {!sidebarCollapsed && <span className="text-xs">Dashboard</span>}
@@ -268,7 +270,7 @@ const CreateWorkflowPage = () => {
           </div>
           <div 
             className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-2'} p-2 bg-accent text-foreground rounded-lg cursor-pointer`}
-            onClick={() => router.push('/flow')}
+            onClick={() => router.push(`/w/${workspaceId}/f`)}
           >
             <Workflow className="w-3 h-3" />
             {!sidebarCollapsed && <span className="font-medium text-xs">Workflow</span>}
@@ -377,7 +379,7 @@ const CreateWorkflowPage = () => {
                   variant="ghost"
                   size="sm"
                   className="h-8 w-8 p-0"
-                  onClick={() => router.push('/flow')}
+                  onClick={() => router.push(`/w/${workspaceId}/f`)}
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
@@ -535,7 +537,7 @@ const CreateWorkflowPage = () => {
             <div className="flex items-center justify-between">
               <Button
                 variant="outline"
-                onClick={() => router.push('/flow')}
+                onClick={() => router.push(`/w/${workspaceId}/f`)}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Workflows

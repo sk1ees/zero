@@ -79,7 +79,7 @@ const Login = () => {
         description: 'Welcome back!',
         variant: 'success'
       });
-      router.push('/dashboard');
+      router.push('/w/default');
     } catch (err: any) {
       toast({
         title: 'Sign in failed',

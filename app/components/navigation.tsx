@@ -16,24 +16,31 @@ import { Button } from './ui/button';
 const Navigation = () => {
   const pathname = usePathname();
 
+  const workspaceMatch = pathname.match(/^\/w\/([^/]+)/);
+  const workspaceId = workspaceMatch ? workspaceMatch[1] : undefined;
+
+  const dashboardHref = workspaceId ? `/w/${workspaceId}` : '/dashboard';
+  const flowsHref = workspaceId ? `/w/${workspaceId}/f` : '/flow';
+  const settingsHref = '/settings';
+
   const navigation = [
     {
       name: 'Dashboard',
-      href: '/dashboard',
+      href: dashboardHref,
       icon: LayoutDashboard,
-      current: pathname === '/dashboard'
+      current: pathname === dashboardHref
     },
     {
       name: 'Flow Editor',
-      href: '/flow',
+      href: flowsHref,
       icon: Workflow,
-      current: pathname === '/flow'
+      current: pathname === flowsHref || pathname.startsWith(`${flowsHref}/`)
     },
     {
       name: 'Settings',
-      href: '/settings',
+      href: settingsHref,
       icon: Settings,
-      current: pathname === '/settings'
+      current: pathname === settingsHref
     }
   ];
 

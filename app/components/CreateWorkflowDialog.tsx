@@ -42,6 +42,7 @@ import {
 interface CreateWorkflowDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  workspaceId?: string;
 }
 
 const workflowTemplates = [
@@ -100,7 +101,8 @@ const workflowTemplates = [
 
 export const CreateWorkflowDialog: React.FC<CreateWorkflowDialogProps> = ({
   open,
-  onOpenChange
+  onOpenChange,
+  workspaceId,
 }) => {
   const router = useRouter();
   const [workflowName, setWorkflowName] = useState('');
@@ -118,8 +120,12 @@ export const CreateWorkflowDialog: React.FC<CreateWorkflowDialogProps> = ({
     // Close the dialog
     onOpenChange(false);
     
-    // Navigate to the new workflow
-    router.push(`/flow/${newWorkflowId}`);
+    // Navigate to the new workflow (workspace-aware if provided)
+    if (workspaceId) {
+      router.push(`/w/${workspaceId}/f/${newWorkflowId}`);
+    } else {
+      router.push(`/flow/${newWorkflowId}`);
+    }
   };
 
   const handleTemplateSelect = (templateId: string) => {

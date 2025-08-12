@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { 
   ArrowLeft,
   ChevronRight,
@@ -19,22 +19,25 @@ import {
   Sun,
   Moon
 } from 'lucide-react';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Badge } from '../../components/ui/badge';
-import { Separator } from '../../components/ui/separator';
-import { N8nFlowEditor } from '../../components/FlowEditor/N8nFlowEditor';
-import { useTheme } from '../../components/theme-provider';
+import { Button } from '../../../../components/ui/button';
+import { Input } from '../../../../components/ui/input';
+import { Badge } from '../../../../components/ui/badge';
+import { Separator } from '../../../../components/ui/separator';
+import { N8nFlowEditor } from '../../../../components/FlowEditor/N8nFlowEditor';
+import { useTheme } from '../../../../components/theme-provider';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
-} from '../../components/ui/dropdown-menu';
+} from '../../../../components/ui/dropdown-menu';
 
 const FlowPage = () => {
   const router = useRouter();
+  const { workspace_id, flow_id } = useParams();
+  const workspaceId = (workspace_id as string) || '';
+  const flowId = (flow_id as string) || '';
   const { theme, toggleTheme } = useTheme();
   const [workflowName, setWorkflowName] = useState('Untitled Workflow');
   const [isEditingName, setIsEditingName] = useState(false);
@@ -51,7 +54,7 @@ const FlowPage = () => {
             variant="ghost"
             size="sm"
             className="h-7 w-7 p-0 hover:bg-accent"
-            onClick={() => router.push('/flow')}
+            onClick={() => router.push(`/w/${workspaceId}/f`)}
           >
             <ArrowLeft className="w-3.5 h-3.5" />
           </Button>
@@ -64,7 +67,7 @@ const FlowPage = () => {
             <ChevronRight className="w-2.5 h-2.5" />
             <span 
               className="text-foreground hover:text-primary cursor-pointer transition-colors"
-              onClick={() => router.push('/flow')}
+              onClick={() => router.push(`/w/${workspaceId}/f`)}
             >
               Workflows
             </span>

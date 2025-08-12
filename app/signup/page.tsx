@@ -68,7 +68,7 @@ const Signup = () => {
       if (signInData.user) {
         // User exists and password is correct, sign them in
         toast({ title: 'Signed in', description: 'Welcome back!' });
-        router.push('/flow');
+      router.push('/w/default/f');
         return;
       }
       
@@ -102,7 +102,7 @@ const Signup = () => {
         description: 'Welcome to zero.ai!',
         variant: 'success'
       });
-      router.push('/dashboard');
+      router.push('/w/default');
       
     } catch (err: any) {
       toast({

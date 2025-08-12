@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { 
   Plus, 
   Search, 
@@ -57,28 +57,28 @@ import {
   Target,
   Sparkles
 } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Badge } from '../components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Separator } from '../components/ui/separator';
-import { ThemeToggle } from '../components/theme-toggle';
-import SearchDialog from '../components/SearchDialog';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Badge } from '../../../components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Separator } from '../../../components/ui/separator';
+import { ThemeToggle } from '../../../components/theme-toggle';
+import SearchDialog from '../../../components/SearchDialog';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
-} from '../components/ui/dropdown-menu';
+} from '../../../components/ui/dropdown-menu';
 import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../components/ui/select';
-import { CreateWorkflowDialog } from '../components/CreateWorkflowDialog';
+} from '../../../components/ui/select';
+import { CreateWorkflowDialog } from '../../../components/CreateWorkflowDialog';
 
 // Mock data for workflows
 const mockWorkflows = [
@@ -170,6 +170,8 @@ const mockWorkflows = [
 
 const WorkflowListPage = () => {
   const router = useRouter();
+  const params = useParams();
+  const workspaceId = (params?.workspace_id as string) || '';
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -292,7 +294,7 @@ const WorkflowListPage = () => {
         <div className="space-y-1 mb-4">
           <div 
             className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-2'} p-2 text-muted-foreground hover:bg-accent rounded-lg cursor-pointer transition-colors`}
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.push(`/w/${workspaceId}`)}
           >
             <Gauge className="w-3 h-3" />
             {!sidebarCollapsed && <span className="text-xs">Dashboard</span>}
@@ -542,7 +544,7 @@ const WorkflowListPage = () => {
                     <Card 
                       key={workflow.id} 
                       className="hover:shadow-md transition-all duration-200 cursor-pointer border-border hover:border-primary/20"
-                      onClick={() => router.push(`/flow/${workflow.id}`)}
+                       onClick={() => router.push(`/w/${workspaceId}/f/${workflow.id}`)}
                     >
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
@@ -634,7 +636,7 @@ const WorkflowListPage = () => {
                     <Card 
                       key={workflow.id} 
                       className="hover:shadow-md transition-all duration-200 cursor-pointer border-border hover:border-primary/20"
-                      onClick={() => router.push(`/flow/${workflow.id}`)}
+                      onClick={() => router.push(`/w/${workspaceId}/f/${workflow.id}`)}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
@@ -713,6 +715,7 @@ const WorkflowListPage = () => {
       <CreateWorkflowDialog 
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
+        workspaceId={workspaceId}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { 
   Plus, 
   Search, 
@@ -35,16 +35,18 @@ import {
   AlertTriangle,
   Workflow
 } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Badge } from '../components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Separator } from '../components/ui/separator';
-import { ThemeToggle } from '../components/theme-toggle';
-import SearchDialog from '../components/SearchDialog';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Badge } from '../../components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Separator } from '../../components/ui/separator';
+import { ThemeToggle } from '../../components/theme-toggle';
+import SearchDialog from '../../components/SearchDialog';
 
 const Dashboard = () => {
   const router = useRouter();
+  const { workspace_id } = useParams();
+  const workspaceId = (workspace_id as string) || '';
   const [appsExpanded, setAppsExpanded] = useState(true);
   const [syncHistoryExpanded, setSyncHistoryExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('most-popular');
@@ -131,7 +133,7 @@ const Dashboard = () => {
           </div>
           <div 
             className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-2'} p-2 text-muted-foreground hover:bg-accent rounded-lg cursor-pointer transition-colors`}
-            onClick={() => router.push('/flow')}
+            onClick={() => router.push(`/w/${workspaceId}/f`)}
           >
             <Workflow className="w-3 h-3" />
             {!sidebarCollapsed && <span className="text-xs">Workflow</span>}
