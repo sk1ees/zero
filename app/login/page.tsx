@@ -74,12 +74,35 @@ const Login = () => {
       }
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      // Fetch user's default workspace
+      const userId = data.user?.id;
+      let destination = '/w/default';
+      if (userId) {
+        const { data: wsData } = await supabase
+          .from('workspaces')
+          .select('id')
+          .eq('owner_user_id', userId)
+          .order('created_at', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        if (wsData) {
+          destination = `/w/${wsData.id}`;
+        }
+      }
       toast({ 
         title: 'Signed in', 
         description: 'Welcome back!',
         variant: 'success'
       });
-      router.push('/w/default');
+      // Save preferred workspace locally to avoid future lookups
+      try {
+        const idMatch = destination.match(/\/w\/(.+)$/);
+        const wsId = idMatch?.[1];
+        if (wsId && typeof window !== 'undefined') {
+          localStorage.setItem('zero_ws_preferred', wsId);
+        }
+      } catch {}
+      router.push(destination);
     } catch (err: any) {
       toast({
         title: 'Sign in failed',

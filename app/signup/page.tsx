@@ -16,6 +16,8 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [step, setStep] = useState<'account' | 'workspace'>('account');
+  const [workspaceName, setWorkspaceName] = useState('');
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const router = useRouter();
   const { toast } = useToast();
@@ -59,50 +61,51 @@ const Signup = () => {
         throw new Error('Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY');
       }
       
-      // First, try to sign in to see if user already exists
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (signInData.user) {
-        // User exists and password is correct, sign them in
-        toast({ title: 'Signed in', description: 'Welcome back!' });
-      router.push('/w/default/f');
+      if (step === 'account') {
+        // Try sign in to detect existing account
+        const { data: signInData } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInData?.user) {
+          // Move directly to workspace step for existing users as well
+          setStep('workspace');
+          return;
+        }
+
+        // Create account using server API (auto-confirm)
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to create account');
+        }
+        // Sign in newly created account
+        const { error: finalSignInError } = await supabase.auth.signInWithPassword({ email, password });
+        if (finalSignInError) throw finalSignInError;
+
+        setStep('workspace');
+        toast({ title: 'Account created', description: 'Let’s set up your workspace', variant: 'success' });
         return;
       }
-      
-      // If sign in fails, create a new account using our API
-      const response = await fetch('/api/auth/signup', {
+
+      // Workspace step
+      const { data: session } = await supabase.auth.getUser();
+      const userId = session.user?.id;
+      if (!userId) throw new Error('Not authenticated');
+
+      const res = await fetch('/api/workspaces', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, name: workspaceName || 'My workspace' }),
       });
-      
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to create account');
+      const wsResult = await res.json();
+      if (!res.ok) throw new Error(wsResult.error || 'Failed to create workspace');
+
+      if (typeof window !== 'undefined') {
+        try { localStorage.setItem('zero_ws_preferred', wsResult.workspace.id); } catch {}
       }
-      
-      // Now try to sign in with the created account
-      const { error: finalSignInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (finalSignInError) {
-        throw finalSignInError;
-      }
-      
-      toast({ 
-        title: 'Account created', 
-        description: 'Welcome to zero.ai!',
-        variant: 'success'
-      });
-      router.push('/w/default');
+      router.push(`/w/${wsResult.workspace.id}`);
       
     } catch (err: any) {
       toast({
@@ -214,63 +217,95 @@ const Signup = () => {
           </div>
 
           <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl p-6 shadow-2xl shadow-primary/5">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
-                <div className="relative group">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 group-focus-within:text-primary" />
+            {step === 'account' ? (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                  <div className="relative group">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 group-focus-within:text-primary" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                      className="pl-10 h-10 focus:ring-2 focus:ring-primary/20"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                  <div className="relative group">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 group-focus-within:text-primary" />
+                    <Input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Create a password"
+                      value={password}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                      className="pl-10 pr-10 h-10 focus:ring-2 focus:ring-primary/20"
+                      required
+                      disabled={isLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                      disabled={isLoading}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full h-10 font-medium" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating account...
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Continue
+                    </>
+                  )}
+                </Button>
+              </form>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="workspaceName" className="text-sm font-medium">Workspace name</Label>
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                    className="pl-10 h-10 focus:ring-2 focus:ring-primary/20"
+                    id="workspaceName"
+                    placeholder="Acme Inc"
+                    value={workspaceName}
+                    onChange={(e) => setWorkspaceName(e.target.value)}
+                    className="h-10"
                     required
                     disabled={isLoading}
                   />
                 </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-                <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 group-focus-within:text-primary" />
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Create a password"
-                    value={password}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 h-10 focus:ring-2 focus:ring-primary/20"
-                    required
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:opacity-50"
-                    disabled={isLoading}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                <div className="flex gap-2">
+                  <Button type="button" variant="outline" className="h-10" onClick={() => setStep('account')} disabled={isLoading}>
+                    Back
+                  </Button>
+                  <Button type="submit" className="flex-1 h-10 font-medium" disabled={isLoading || !workspaceName.trim()}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating workspace...
+                      </>
+                    ) : (
+                      'Create workspace'
+                    )}
+                  </Button>
                 </div>
-              </div>
-
-              <Button type="submit" className="w-full h-10 font-medium" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Create account
-                  </>
-                )}
-              </Button>
-            </form>
+              </form>
+            )}
           </div>
 
           <div className="text-center">

@@ -60,6 +60,7 @@ import {
   Tag
 } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
+import { useUserWorkspace } from '../../../../hooks/useUserWorkspace';
 import { Input } from '../../../../components/ui/input';
 import { Badge } from '../../../../components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
@@ -81,6 +82,7 @@ import {
   SelectValue,
 } from '../../../../components/ui/select';
 import { Textarea } from '../../../../components/ui/textarea';
+import { supabaseClient } from '@/lib/supabaseClient';
 
 // Mock templates
 const workflowTemplates = [
@@ -156,6 +158,7 @@ const CreateWorkflowPage = () => {
   const [workflowDescription, setWorkflowDescription] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const { isLoading, userDisplayName, userEmail, workspaceName, hasAccess } = useUserWorkspace(workspaceId);
 
   const filteredTemplates = workflowTemplates.filter(template => {
     const matchesSearch = template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -195,7 +198,7 @@ const CreateWorkflowPage = () => {
                 <Workflow className="w-4 h-4 text-primary-foreground" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-foreground">zamuri.ai</div>
+                <div className="text-sm font-semibold text-foreground">{workspaceName || 'Workspace'}</div>
                 <div className="text-xs text-muted-foreground">Professional Plan</div>
               </div>
             </div>
@@ -216,15 +219,15 @@ const CreateWorkflowPage = () => {
         </div>
 
         {/* User Profile */}
-        <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-2'} mb-4 p-2 bg-card rounded-lg border border-border shadow-sm`}>
+          <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-2'} mb-4 p-2 bg-card rounded-lg border border-border shadow-sm`}>
           <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center">
             <User className="w-3 h-3 text-muted-foreground" />
           </div>
           {!sidebarCollapsed && (
             <>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-foreground truncate">Kristin Watson</div>
-                <div className="text-xs text-muted-foreground truncate">watsonkristin@mail.com</div>
+                  <div className="text-xs font-medium text-foreground truncate">{userDisplayName || 'User'}</div>
+                  <div className="text-xs text-muted-foreground truncate">{userEmail || ''}</div>
               </div>
               <ChevronDown className="w-3 h-3 text-muted-foreground flex-shrink-0" />
             </>
@@ -395,7 +398,46 @@ const CreateWorkflowPage = () => {
           </div>
         </div>
 
+        {/* Hard block for restricted */}
+        {!isLoading && !hasAccess ? (
+          <div className="px-6 py-12">
+            <div className="max-w-lg w-full mx-auto border border-border rounded-lg bg-card p-6">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 text-amber-500" />
+                <div className="text-lg font-semibold text-foreground">Restricted access</div>
+              </div>
+              <div className="text-sm text-muted-foreground mb-4">
+                You don’t have permission to view this workspace.
+              </div>
+              <div className="mb-4 text-xs text-muted-foreground">
+                Workspace ID: <span className="font-mono text-foreground">{workspaceId}</span>
+              </div>
+              <div className="rounded-md border border-amber-200/30 bg-amber-500/10 p-3 text-xs text-amber-600 dark:text-amber-400 mb-4">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-3.5 h-3.5 mt-0.5" />
+                  <div>
+                    - Check you’re logged in with the right account<br />
+                    - Ask the workspace owner to grant you access
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={async () => {
+                  try {
+                    const preferred = typeof window !== 'undefined' ? localStorage.getItem('zero_ws_preferred') : null;
+                    if (preferred) { router.push(`/w/${preferred}`); return; }
+                    if (workspaceId) { router.push(`/w/${workspaceId}`); return; }
+                    router.push('/');
+                  } catch { router.push('/'); }
+                }}>Home</Button>
+                <Button onClick={() => router.push('/login')}>Login</Button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         {/* Content */}
+        {(hasAccess && !isLoading) && (
         <div className="flex-1 p-6">
           <div className="max-w-6xl mx-auto">
             {/* Workflow Details Form */}
@@ -554,6 +596,7 @@ const CreateWorkflowPage = () => {
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

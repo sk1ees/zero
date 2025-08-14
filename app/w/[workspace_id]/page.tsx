@@ -33,15 +33,20 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   AlertTriangle,
-  Workflow
+  Workflow,
+  LogOut,
+  Loader2
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { useUserWorkspace } from '../../hooks/useUserWorkspace';
 import { Input } from '../../components/ui/input';
 import { Badge } from '../../components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Separator } from '../../components/ui/separator';
 import { ThemeToggle } from '../../components/theme-toggle';
+import { supabaseClient } from '@/lib/supabaseClient';
 import SearchDialog from '../../components/SearchDialog';
+import { useToast } from '../../hooks/use-toast';
 
 const Dashboard = () => {
   const router = useRouter();
@@ -51,6 +56,89 @@ const Dashboard = () => {
   const [syncHistoryExpanded, setSyncHistoryExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('most-popular');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { isLoading, userDisplayName, userEmail, workspaceName, hasAccess } = useUserWorkspace(workspaceId);
+  const { toast } = useToast();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const goHome = async () => {
+    try {
+      if (!supabaseClient) {
+        router.push('/');
+        return;
+      }
+      const { data: userRes } = await supabaseClient.auth.getUser();
+      const userId = userRes.user?.id;
+      if (!userId) {
+        router.push('/login');
+        return;
+      }
+      // Try use cached preferred workspace from localStorage
+      const preferredKey = 'zero_ws_preferred';
+      const preferred = typeof window !== 'undefined' ? localStorage.getItem(preferredKey) : null;
+      if (preferred) {
+        router.push(`/w/${preferred}`);
+        return;
+      }
+      // Fallback: use current route param as best guess
+      if (workspaceId) {
+        router.push(`/w/${workspaceId}`);
+        return;
+      }
+      router.push('/');
+    } catch {
+      router.push('/');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      if (supabaseClient) {
+        await supabaseClient.auth.signOut();
+      }
+      if (typeof window !== 'undefined') {
+        try { localStorage.removeItem('zero_ws_preferred'); } catch {}
+      }
+      toast({ title: 'Signed out', description: 'You have been logged out.' });
+      router.replace('/login');
+    } catch (err: any) {
+      toast({ title: 'Logout failed', description: err?.message || 'Please try again' });
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  if (!isLoading && !hasAccess) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="max-w-lg w-full border border-border rounded-lg bg-card p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="w-4 h-4 text-amber-500" />
+            <div className="text-lg font-semibold text-foreground">Restricted access</div>
+          </div>
+          <div className="text-sm text-muted-foreground mb-4">
+            You don’t have permission to view this workspace.
+          </div>
+          <div className="mb-4 text-xs text-muted-foreground">
+            Workspace ID: <span className="font-mono text-foreground">{workspaceId}</span>
+          </div>
+          <div className="rounded-md border border-amber-200/30 bg-amber-500/10 p-3 text-xs text-amber-600 dark:text-amber-400 mb-4">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="w-3.5 h-3.5 mt-0.5" />
+              <div>
+                - Make sure you’re logged in with the correct account<br />
+                - Ask the workspace owner to grant you access
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={goHome}>Home</Button>
+            <Button onClick={() => router.push('/login')}>Login</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -64,7 +152,7 @@ const Dashboard = () => {
                 <Gauge className="w-4 h-4 text-primary-foreground" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-foreground">zamuri.ai</div>
+                <div className="text-sm font-semibold text-foreground">{workspaceName || 'Workspace'}</div>
                 <div className="text-xs text-muted-foreground">Professional Plan</div>
               </div>
             </div>
@@ -85,21 +173,7 @@ const Dashboard = () => {
         </div>
 
       
-        {/* User Profile */}
-        <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-2'} mb-4 p-2 bg-card rounded-lg border border-border shadow-sm`}>
-          <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center">
-            <User className="w-3 h-3 text-muted-foreground" />
-          </div>
-          {!sidebarCollapsed && (
-            <>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-foreground truncate">Kristin Watson</div>
-                <div className="text-xs text-muted-foreground truncate">watsonkristin@mail.com</div>
-              </div>
-              <ChevronDown className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-            </>
-          )}
-        </div>
+   
   {/* Plan Info */}
   {!sidebarCollapsed && (
           <Card className="bg-muted border-border shadow-sm mb-4">
@@ -222,7 +296,7 @@ const Dashboard = () => {
                   <Gauge className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <div>
-                  <span className="text-sm font-semibold text-foreground">zamuri.ai</span>
+                  <span className="text-sm font-semibold text-foreground">{workspaceName || 'Workspace'}</span>
                   <span className="text-xs text-muted-foreground ml-1">Professional Plan</span>
                 </div>
               </div>
@@ -261,8 +335,20 @@ const Dashboard = () => {
                 <User className="w-3 h-3 text-muted-foreground" />
               </div>
               
-              <Button variant="outline" className="text-muted-foreground border-border h-7 text-xs">
-                Customize Widget
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-3 text-xs rounded-full bg-destructive/10 text-destructive border border-destructive/30 hover:bg-destructive/15 hover:text-destructive hover:border-destructive/40 transition-colors"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                aria-label="Logout"
+              >
+                {isLoggingOut ? (
+                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                ) : (
+                  <LogOut className="w-3 h-3 mr-1" />
+                )}
+                <span className="hidden sm:inline">Logout</span>
               </Button>
               
               <Button className="bg-primary hover:bg-primary/90 text-primary-foreground h-7 shadow-sm text-xs">
@@ -272,6 +358,13 @@ const Dashboard = () => {
             </div>
           </div>
         </header>
+
+        {/* Restricted banner */}
+        {!hasAccess && (
+          <div className="px-4 py-3 bg-destructive/10 text-destructive border-b border-border text-sm">
+            Restricted: You do not have access to this workspace.
+          </div>
+        )}
 
                 {/* Analytics Charts */}
         <div className="px-4 py-3 bg-card border-b border-border">

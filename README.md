@@ -16,6 +16,35 @@ Create `.env.local` in the project root with:
 ```
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
 Then run `npm run dev` and visit `/signup` or `/login`.
+
+### Database
+
+Create the `workspaces` table and basic RLS policies in Supabase:
+
+```
+create table if not exists public.workspaces (
+  id uuid primary key default gen_random_uuid(),
+  owner_user_id uuid not null references auth.users(id) on delete cascade,
+  name text not null,
+  slug text unique,
+  created_at timestamp with time zone default now()
+);
+
+alter table public.workspaces enable row level security;
+
+create policy "owner can read own workspaces" on public.workspaces
+  for select using (auth.uid() = owner_user_id);
+
+create policy "owner can insert own workspaces" on public.workspaces
+  for insert with check (auth.uid() = owner_user_id);
+
+create policy "owner can update own workspaces" on public.workspaces
+  for update using (auth.uid() = owner_user_id);
+
+create policy "owner can delete own workspaces" on public.workspaces
+  for delete using (auth.uid() = owner_user_id);
+```

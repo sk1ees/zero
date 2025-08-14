@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./components/theme-provider";
+import { AuthBoundary } from './components/AuthBoundary';
 import { ToastProvider, ToastViewport } from "./components/ui/toast";
 import { Toaster } from "./components/ui/toaster";
 
@@ -32,7 +33,9 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <ToastProvider>
-            {children}
+            <AuthBoundary>
+              {children}
+            </AuthBoundary>
             <ToastViewport />
             <Toaster />
           </ToastProvider>
