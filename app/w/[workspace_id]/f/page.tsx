@@ -80,6 +80,8 @@ import {
   SelectValue,
 } from '../../../components/ui/select';
 import { CreateWorkflowDialog } from '../../../components/CreateWorkflowDialog';
+import { DeleteWorkflowDialog } from '../../../components/DeleteWorkflowDialog';
+import { EditWorkflowDialog } from '../../../components/EditWorkflowDialog';
 import { supabaseClient } from '@/lib/supabaseClient';
 import { useWorkflows } from '../../../hooks/useWorkflows';
 
@@ -109,10 +111,16 @@ const WorkflowListPage = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [workflowToDelete, setWorkflowToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [workflowToEdit, setWorkflowToEdit] = useState<any>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [appsExpanded, setAppsExpanded] = useState(true);
   const [syncHistoryExpanded, setSyncHistoryExpanded] = useState(false);
   const { isLoading, userDisplayName, userEmail, workspaceName, hasAccess } = useUserWorkspace(workspaceId);
-  const { workflows, loading: workflowsLoading, deleteWorkflow } = useWorkflows();
+  const { workflows, loading: workflowsLoading, deleteWorkflow, updateWorkflow } = useWorkflows();
 
   const filteredWorkflows = workflows.filter(workflow => {
     const matchesSearch = workflow.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -148,6 +156,44 @@ const WorkflowListPage = () => {
       case 'automation': return <Sparkles className="w-4 h-4" />;
       case 'pipeline': return <Workflow className="w-4 h-4" />;
       default: return <Workflow className="w-4 h-4" />;
+    }
+  };
+
+  const handleDeleteWorkflow = async () => {
+    if (!workflowToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await deleteWorkflow(workflowToDelete.id);
+      setDeleteDialogOpen(false);
+      setWorkflowToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete workflow:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const openDeleteDialog = (workflow: { id: string; name: string }) => {
+    setWorkflowToDelete(workflow);
+    setDeleteDialogOpen(true);
+  };
+
+  const openEditDialog = (workflow: any) => {
+    setWorkflowToEdit(workflow);
+    setEditDialogOpen(true);
+  };
+
+  const handleEditWorkflow = async (workflowId: string, data: any) => {
+    setIsEditing(true);
+    try {
+      await updateWorkflow(workflowId, data);
+      setEditDialogOpen(false);
+      setWorkflowToEdit(null);
+    } catch (error) {
+      console.error('Failed to update workflow:', error);
+    } finally {
+      setIsEditing(false);
     }
   };
 
@@ -549,9 +595,23 @@ const WorkflowListPage = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openEditDialog(workflow);
+                                }}
+                              >
                                 <Edit3 className="w-4 h-4 mr-2" />
-                                Edit
+                                Edit Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  router.push(`/w/${workspaceId}/f/${workflow.id}`);
+                                }}
+                              >
+                                <Edit3 className="w-4 h-4 mr-2" />
+                                Open Editor
                               </DropdownMenuItem>
                               <DropdownMenuItem>
                                 <Copy className="w-4 h-4 mr-2" />
@@ -566,9 +626,7 @@ const WorkflowListPage = () => {
                                 className="text-red-600"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (confirm('Are you sure you want to delete this workflow?')) {
-                                    deleteWorkflow(workflow.id);
-                                  }
+                                  openDeleteDialog(workflow);
                                 }}
                               >
                                 <Trash2 className="w-4 h-4 mr-2" />
@@ -666,9 +724,23 @@ const WorkflowListPage = () => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openEditDialog(workflow);
+                                  }}
+                                >
                                   <Edit3 className="w-4 h-4 mr-2" />
-                                  Edit
+                                  Edit Details
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    router.push(`/w/${workspaceId}/f/${workflow.id}`);
+                                  }}
+                                >
+                                  <Edit3 className="w-4 h-4 mr-2" />
+                                  Open Editor
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                   <Copy className="w-4 h-4 mr-2" />
@@ -683,9 +755,7 @@ const WorkflowListPage = () => {
                                   className="text-red-600"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    if (confirm('Are you sure you want to delete this workflow?')) {
-                                      deleteWorkflow(workflow.id);
-                                    }
+                                    openDeleteDialog(workflow);
                                   }}
                                 >
                                   <Trash2 className="w-4 h-4 mr-2" />
@@ -710,6 +780,24 @@ const WorkflowListPage = () => {
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
         workspaceId={workspaceId}
+      />
+
+      {/* Delete Workflow Dialog */}
+      <DeleteWorkflowDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        workflowName={workflowToDelete?.name || ''}
+        onConfirm={handleDeleteWorkflow}
+        isLoading={isDeleting}
+      />
+
+      {/* Edit Workflow Dialog */}
+      <EditWorkflowDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        workflow={workflowToEdit}
+        onSave={handleEditWorkflow}
+        isLoading={isEditing}
       />
     </div>
   );

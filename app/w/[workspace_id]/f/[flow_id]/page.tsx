@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { 
   ArrowLeft,
@@ -26,6 +26,7 @@ import { Badge } from '../../../../components/ui/badge';
 import { Separator } from '../../../../components/ui/separator';
 import { N8nFlowEditor } from '../../../../components/FlowEditor/N8nFlowEditor';
 import { useUserWorkspace } from '../../../../hooks/useUserWorkspace';
+import { useWorkflows } from '../../../../hooks/useWorkflows';
 import { useTheme } from '../../../../components/theme-provider';
 import { 
   DropdownMenu, 
@@ -45,6 +46,45 @@ const FlowPage = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [showMiniMap, setShowMiniMap] = useState(true);
   const { isLoading, hasAccess, workspaceName } = useUserWorkspace(workspaceId);
+  const { getWorkflow, updateWorkflow } = useWorkflows();
+  const [workflow, setWorkflow] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Load workflow data
+  useEffect(() => {
+    const loadWorkflow = async () => {
+      if (!flowId) return;
+      
+      try {
+        setLoading(true);
+        const workflowData = await getWorkflow(flowId);
+        if (workflowData) {
+          setWorkflow(workflowData);
+          setWorkflowName(workflowData.name);
+        }
+      } catch (error) {
+        console.error('Failed to load workflow:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadWorkflow();
+  }, [flowId, getWorkflow]);
+
+  // Handle name update
+  const handleNameUpdate = async () => {
+    if (!workflow || !flowId) return;
+    
+    try {
+      await updateWorkflow(flowId, { name: workflowName });
+      setIsEditingName(false);
+    } catch (error) {
+      console.error('Failed to update workflow name:', error);
+      // Revert to original name on error
+      setWorkflowName(workflow.name);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -57,7 +97,7 @@ const FlowPage = () => {
               <div className="text-lg font-semibold text-foreground">Restricted access</div>
             </div>
             <div className="text-sm text-muted-foreground mb-4">
-              You don’t have permission to view this workspace.
+              You don't have permission to view this workspace.
             </div>
             <div className="mb-4 text-xs text-muted-foreground">
               Workspace ID: <span className="font-mono text-foreground">{workspaceId}</span>
@@ -66,7 +106,7 @@ const FlowPage = () => {
               <div className="flex items-start gap-2">
                 <AlertTriangle className="w-3.5 h-3.5 mt-0.5" />
                 <div>
-                  - Check you’re logged in with the right account<br />
+                  - Check you're logged in with the right account<br />
                   - Ask the workspace owner to grant you access
                 </div>
               </div>
@@ -84,156 +124,170 @@ const FlowPage = () => {
             </div>
           </div>
         </div>
-      ) : null}
-
-      {/* Workflow Editor Header */}
-      <div className="h-12 border-b border-border bg-card flex items-center justify-between px-4">
-        {/* Left Section */}
-        <div className="flex items-center gap-3">
-          {/* Back Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 w-7 p-0 hover:bg-accent"
-            onClick={() => router.push(`/w/${workspaceId}/f`)}
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-          </Button>
-          
-          {/* Breadcrumbs */}
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Home className="w-3 h-3" />
-            <ChevronRight className="w-2.5 h-2.5" />
-            <Workflow className="w-3 h-3" />
-            <ChevronRight className="w-2.5 h-2.5" />
-            <span 
-              className="text-foreground hover:text-primary cursor-pointer transition-colors"
-              onClick={() => router.push(`/w/${workspaceId}/f`)}
-            >
-              {workspaceName || 'Workflows'}
-            </span>
-            <ChevronRight className="w-2.5 h-2.5" />
-            <span className="text-foreground">{workflowName}</span>
-          </div>
-          
-          <Separator orientation="vertical" className="h-4" />
-          
-          {/* Workflow Name */}
-          <div className="flex items-center gap-2">
-            {isEditingName ? (
-              <Input
-                value={workflowName}
-                onChange={(e) => setWorkflowName(e.target.value)}
-                onBlur={() => setIsEditingName(false)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') setIsEditingName(false);
-                  if (e.key === 'Escape') setIsEditingName(false);
-                }}
-                className="h-7 w-40 text-xs font-medium"
-                autoFocus
-              />
+      ) : (
+        <>
+          {/* Workflow Editor Header */}
+          <div className="h-12 border-b border-border bg-card flex items-center justify-between px-4">
+            {loading ? (
+              <div className="flex items-center justify-center w-full">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                <span className="text-sm text-muted-foreground">Loading workflow...</span>
+              </div>
             ) : (
-              <button
-                onClick={() => setIsEditingName(true)}
-                className="text-xs font-medium text-foreground hover:text-primary transition-colors"
-              >
-                {workflowName}
-              </button>
+              <>
+                {/* Left Section */}
+                <div className="flex items-center gap-3">
+                  {/* Back Button */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 hover:bg-accent"
+                    onClick={() => router.push(`/w/${workspaceId}/f`)}
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                  </Button>
+                  
+                  {/* Breadcrumbs */}
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Home className="w-3 h-3" />
+                    <ChevronRight className="w-2.5 h-2.5" />
+                    <Workflow className="w-3 h-3" />
+                    <ChevronRight className="w-2.5 h-2.5" />
+                    <span 
+                      className="text-foreground hover:text-primary cursor-pointer transition-colors"
+                      onClick={() => router.push(`/w/${workspaceId}/f`)}
+                    >
+                      {workspaceName || 'Workflows'}
+                    </span>
+                    <ChevronRight className="w-2.5 h-2.5" />
+                    <span className="text-foreground">{workflowName}</span>
+                  </div>
+                  
+                  <Separator orientation="vertical" className="h-4" />
+                  
+                  {/* Workflow Name */}
+                  <div className="flex items-center gap-2">
+                    {isEditingName ? (
+                      <Input
+                        value={workflowName}
+                        onChange={(e) => setWorkflowName(e.target.value)}
+                        onBlur={handleNameUpdate}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleNameUpdate();
+                          if (e.key === 'Escape') {
+                            setWorkflowName(workflow?.name || 'Untitled Workflow');
+                            setIsEditingName(false);
+                          }
+                        }}
+                        className="h-7 w-40 text-xs font-medium"
+                        autoFocus
+                      />
+                    ) : (
+                      <button
+                        onClick={() => setIsEditingName(true)}
+                        className="text-xs font-medium text-foreground hover:text-primary transition-colors"
+                      >
+                        {workflowName}
+                      </button>
+                    )}
+                    <Badge variant="secondary" className="text-xs px-1.5 py-0.5">Draft</Badge>
+                  </div>
+                </div>
+
+                {/* Center Section - Action Buttons */}
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 gap-1.5 text-xs"
+                  >
+                    <Eye className="w-3 h-3" />
+                    Preview
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 gap-1.5 text-xs"
+                  >
+                    <Save className="w-3 h-3" />
+                    Save
+                  </Button>
+                  
+                  <Button
+                    size="sm"
+                    className="h-7 gap-1.5 text-xs"
+                  >
+                    <Play className="w-3 h-3" />
+                    Execute
+                  </Button>
+                </div>
+
+                {/* Right Section */}
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 hover:bg-accent"
+                    onClick={() => setShowMiniMap(!showMiniMap)}
+                  >
+                    {showMiniMap ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  </Button>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={toggleTheme}
+                    className="h-7 w-7 p-0 hover:bg-accent"
+                  >
+                    {theme === 'light' ? (
+                      <Moon className="w-3.5 h-3.5 text-muted-foreground" />
+                    ) : (
+                      <Sun className="w-3.5 h-3.5 text-muted-foreground" />
+                    )}
+                  </Button>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 hover:bg-accent"
+                      >
+                        <MoreHorizontal className="h-3.5 w-3.5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>
+                        <Download className="w-4 h-4 mr-2" />
+                        Export
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Import
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>
+                        <Share2 className="w-4 h-4 mr-2" />
+                        Share
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Settings className="w-4 h-4 mr-2" />
+                        Settings
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </>
             )}
-            <Badge variant="secondary" className="text-xs px-1.5 py-0.5">Draft</Badge>
           </div>
-        </div>
 
-        {/* Center Section - Action Buttons */}
-        <div className="flex items-center gap-1.5">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 gap-1.5 text-xs"
-          >
-            <Eye className="w-3 h-3" />
-            Preview
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 gap-1.5 text-xs"
-          >
-            <Save className="w-3 h-3" />
-            Save
-          </Button>
-          
-          <Button
-            size="sm"
-            className="h-7 gap-1.5 text-xs"
-          >
-            <Play className="w-3 h-3" />
-            Execute
-          </Button>
-        </div>
-
-        {/* Right Section */}
-        <div className="flex items-center gap-1.5">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 w-7 p-0 hover:bg-accent"
-            onClick={() => setShowMiniMap(!showMiniMap)}
-          >
-            {showMiniMap ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleTheme}
-            className="h-7 w-7 p-0 hover:bg-accent"
-          >
-            {theme === 'light' ? (
-              <Moon className="w-3.5 h-3.5 text-muted-foreground" />
-            ) : (
-              <Sun className="w-3.5 h-3.5 text-muted-foreground" />
-            )}
-          </Button>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 hover:bg-accent"
-              >
-                <MoreHorizontal className="h-3.5 w-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Upload className="w-4 h-4 mr-2" />
-                Import
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Share2 className="w-4 h-4 mr-2" />
-                Share
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      {/* Flow Editor Content */}
-      <div className="flex-1">
-        <N8nFlowEditor />
-      </div>
+          {/* Flow Editor Content */}
+          <div className="flex-1">
+            <N8nFlowEditor />
+          </div>
+        </>
+      )}
     </div>
   );
 };
