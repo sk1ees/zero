@@ -81,94 +81,23 @@ import {
 } from '../../../components/ui/select';
 import { CreateWorkflowDialog } from '../../../components/CreateWorkflowDialog';
 import { supabaseClient } from '@/lib/supabaseClient';
+import { useWorkflows } from '../../../hooks/useWorkflows';
 
-// Mock data for workflows
-const mockWorkflows = [
-  {
-    id: '4875983',
-    name: 'Customer Data Sync',
-    description: 'Automatically sync customer data from CRM to database',
-    status: 'active',
-    lastRun: '2 hours ago',
-    nextRun: 'In 4 hours',
-    runs: 1247,
-    successRate: 98.5,
-    tags: ['CRM', 'Database', 'Automation'],
-    type: 'sync',
-    created: '2024-01-15',
-    updated: '2024-01-20'
-  },
-  {
-    id: '4875984',
-    name: 'Email Marketing Campaign',
-    description: 'Send personalized emails based on user behavior',
-    status: 'draft',
-    lastRun: 'Never',
-    nextRun: 'Not scheduled',
-    runs: 0,
-    successRate: 0,
-    tags: ['Email', 'Marketing', 'Personalization'],
-    type: 'automation',
-    created: '2024-01-18',
-    updated: '2024-01-19'
-  },
-  {
-    id: '4875985',
-    name: 'Order Processing Pipeline',
-    description: 'Process orders and update inventory automatically',
-    status: 'active',
-    lastRun: '5 minutes ago',
-    nextRun: 'In 15 minutes',
-    runs: 8923,
-    successRate: 99.2,
-    tags: ['Orders', 'Inventory', 'E-commerce'],
-    type: 'pipeline',
-    created: '2024-01-10',
-    updated: '2024-01-20'
-  },
-  {
-    id: '4875986',
-    name: 'Social Media Integration',
-    description: 'Sync social media posts across platforms',
-    status: 'paused',
-    lastRun: '1 day ago',
-    nextRun: 'Paused',
-    runs: 456,
-    successRate: 95.8,
-    tags: ['Social Media', 'Integration', 'Content'],
-    type: 'sync',
-    created: '2024-01-12',
-    updated: '2024-01-18'
-  },
-  {
-    id: '4875987',
-    name: 'Data Backup System',
-    description: 'Automated daily backup of critical data',
-    status: 'active',
-    lastRun: '1 hour ago',
-    nextRun: 'In 23 hours',
-    runs: 365,
-    successRate: 100,
-    tags: ['Backup', 'Security', 'Data'],
-    type: 'automation',
-    created: '2024-01-01',
-    updated: '2024-01-20'
-  },
-  {
-    id: '4875988',
-    name: 'Lead Qualification Bot',
-    description: 'Automatically qualify leads based on criteria',
-    status: 'draft',
-    lastRun: 'Never',
-    nextRun: 'Not scheduled',
-    runs: 0,
-    successRate: 0,
-    tags: ['Leads', 'AI', 'Qualification'],
-    type: 'automation',
-    created: '2024-01-19',
-    updated: '2024-01-19'
-  }
-];
+// Helper function to format relative time
+const formatRelativeTime = (dateString: string | null) => {
+  if (!dateString) return 'Never';
+  
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  
+  if (diffInSeconds < 60) return 'Just now';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+  
+  return date.toLocaleDateString();
+};
 
 const WorkflowListPage = () => {
   const router = useRouter();
@@ -183,8 +112,9 @@ const WorkflowListPage = () => {
   const [appsExpanded, setAppsExpanded] = useState(true);
   const [syncHistoryExpanded, setSyncHistoryExpanded] = useState(false);
   const { isLoading, userDisplayName, userEmail, workspaceName, hasAccess } = useUserWorkspace(workspaceId);
+  const { workflows, loading: workflowsLoading, deleteWorkflow } = useWorkflows();
 
-  const filteredWorkflows = mockWorkflows.filter(workflow => {
+  const filteredWorkflows = workflows.filter(workflow => {
     const matchesSearch = workflow.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          workflow.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          workflow.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -564,7 +494,12 @@ const WorkflowListPage = () => {
 
         {/* Workflows Content */}
         <div className="flex-1 p-6">
-          {filteredWorkflows.length === 0 ? (
+          {workflowsLoading ? (
+            <div className="flex flex-col items-center justify-center h-64 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Loading workflows...</h3>
+            </div>
+          ) : filteredWorkflows.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-center">
               <Workflow className="w-12 h-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">No workflows found</h3>
@@ -627,7 +562,15 @@ const WorkflowListPage = () => {
                                 Share
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-red-600">
+                              <DropdownMenuItem 
+                                className="text-red-600"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (confirm('Are you sure you want to delete this workflow?')) {
+                                    deleteWorkflow(workflow.id);
+                                  }
+                                }}
+                              >
                                 <Trash2 className="w-4 h-4 mr-2" />
                                 Delete
                               </DropdownMenuItem>
@@ -657,16 +600,16 @@ const WorkflowListPage = () => {
                           <div className="flex items-center space-x-4">
                             <div className="flex items-center space-x-1">
                               <BarChart className="w-3 h-3" />
-                              <span>{workflow.runs}</span>
+                              <span>{workflow.runs_count}</span>
                             </div>
                             <div className="flex items-center space-x-1">
                               <Target className="w-3 h-3" />
-                              <span>{workflow.successRate}%</span>
+                              <span>{workflow.success_rate}%</span>
                             </div>
                           </div>
                           <div className="flex items-center space-x-1">
                             <Clock className="w-3 h-3" />
-                            <span>{workflow.lastRun}</span>
+                            <span>{formatRelativeTime(workflow.last_run)}</span>
                           </div>
                         </div>
                       </CardContent>
@@ -704,15 +647,15 @@ const WorkflowListPage = () => {
                             <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                               <div className="flex items-center space-x-1">
                                 <BarChart className="w-4 h-4" />
-                                <span>{workflow.runs}</span>
+                                <span>{workflow.runs_count}</span>
                               </div>
                               <div className="flex items-center space-x-1">
                                 <Target className="w-4 h-4" />
-                                <span>{workflow.successRate}%</span>
+                                <span>{workflow.success_rate}%</span>
                               </div>
                               <div className="flex items-center space-x-1">
                                 <Clock className="w-4 h-4" />
-                                <span>{workflow.lastRun}</span>
+                                <span>{formatRelativeTime(workflow.last_run)}</span>
                               </div>
                             </div>
                             
@@ -736,7 +679,15 @@ const WorkflowListPage = () => {
                                   Share
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-red-600">
+                                <DropdownMenuItem 
+                                  className="text-red-600"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (confirm('Are you sure you want to delete this workflow?')) {
+                                      deleteWorkflow(workflow.id);
+                                    }
+                                  }}
+                                >
                                   <Trash2 className="w-4 h-4 mr-2" />
                                   Delete
                                 </DropdownMenuItem>

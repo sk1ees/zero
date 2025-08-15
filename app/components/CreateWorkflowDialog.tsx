@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useWorkflows, CreateWorkflowData } from '../hooks/useWorkflows';
 import { 
   X, 
   Plus, 
@@ -17,7 +18,9 @@ import {
   MessageSquare,
   BarChart3,
   Settings,
-  Star
+  Star,
+  Tag,
+  Check
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -52,7 +55,8 @@ const workflowTemplates = [
     description: 'Send automated emails based on triggers',
     icon: Mail,
     category: 'automation',
-    popular: true
+    popular: true,
+    tags: ['Email', 'Marketing', 'Automation']
   },
   {
     id: 'data-sync',
@@ -60,42 +64,48 @@ const workflowTemplates = [
     description: 'Synchronize data between different systems',
     icon: Database,
     category: 'sync',
-    popular: true
+    popular: true,
+    tags: ['Sync', 'Database', 'ETL']
   },
   {
     id: 'lead-qualification',
     name: 'Lead Qualification',
     description: 'Automatically qualify leads based on criteria',
     icon: Users,
-    category: 'automation'
+    category: 'automation',
+    tags: ['Leads', 'AI', 'Qualification']
   },
   {
     id: 'social-media',
     name: 'Social Media Integration',
     description: 'Manage social media posts across platforms',
     icon: Globe,
-    category: 'sync'
+    category: 'sync',
+    tags: ['Social', 'Content', 'Integration']
   },
   {
     id: 'chatbot',
     name: 'AI Chatbot',
     description: 'Create intelligent customer support chatbot',
     icon: MessageSquare,
-    category: 'automation'
+    category: 'automation',
+    tags: ['Chatbot', 'Support', 'AI']
   },
   {
     id: 'analytics',
     name: 'Analytics Pipeline',
     description: 'Process and analyze data automatically',
     icon: BarChart3,
-    category: 'pipeline'
+    category: 'pipeline',
+    tags: ['Analytics', 'Pipeline', 'Data']
   },
   {
     id: 'blank',
     name: 'Blank Workflow',
     description: 'Start from scratch with a blank canvas',
     icon: Plus,
-    category: 'custom'
+    category: 'custom',
+    tags: []
   }
 ];
 
@@ -105,26 +115,53 @@ export const CreateWorkflowDialog: React.FC<CreateWorkflowDialogProps> = ({
   workspaceId,
 }) => {
   const router = useRouter();
+  const { createWorkflow } = useWorkflows();
   const [workflowName, setWorkflowName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [step, setStep] = useState<'details' | 'template'>('details');
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
 
-  const handleCreate = () => {
-    if (!workflowName.trim()) return;
+  const allSuggestedTags = useMemo(() => {
+    const base = workflowTemplates.flatMap(t => t.tags || []);
+    const extras = ['Automation', 'Sync', 'Pipeline', 'Custom'];
+    return Array.from(new Set([...base, ...extras]))
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b));
+  }, []);
+
+  const filteredSuggestions = useMemo(() => {
+    const query = tagInput.trim().toLowerCase();
+    const remaining = allSuggestedTags.filter(t => !tags.includes(t));
+    if (!query) return remaining.slice(0, 6);
+    return remaining.filter(t => t.toLowerCase().includes(query)).slice(0, 6);
+  }, [allSuggestedTags, tagInput, tags]);
+
+  const handleCreate = async () => {
+    if (!workflowName.trim() || !workspaceId) return;
     
-    // Generate a random ID for the new workflow
-    const newWorkflowId = Math.random().toString(36).substr(2, 9);
-    
-    // Close the dialog
-    onOpenChange(false);
-    
-    // Navigate to the new workflow (workspace-aware if provided)
-    if (workspaceId) {
-      router.push(`/w/${workspaceId}/f/${newWorkflowId}`);
-    } else {
-      router.push(`/flow/${newWorkflowId}`);
+    try {
+      const workflowData: CreateWorkflowData = {
+        name: workflowName.trim(),
+        description: description.trim(),
+        type: selectedType as 'sync' | 'automation' | 'pipeline' | 'custom',
+        tags: tags,
+        config: {}
+      };
+      
+      const newWorkflow = await createWorkflow(workflowData);
+      
+      if (newWorkflow) {
+        // Close the dialog
+        onOpenChange(false);
+        
+        // Navigate to the new workflow
+        router.push(`/w/${workspaceId}/f/${newWorkflow.id}`);
+      }
+    } catch (error) {
+      console.error('Failed to create workflow:', error);
     }
   };
 
@@ -139,6 +176,11 @@ export const CreateWorkflowDialog: React.FC<CreateWorkflowDialogProps> = ({
       if (!description) {
         setDescription(template.description);
       }
+      if (template.tags && template.tags.length > 0) {
+        // Pre-fill a couple of recommended tags without duplicating existing
+        const toAdd = template.tags.filter(t => !tags.includes(t)).slice(0, 2);
+        if (toAdd.length) setTags(prev => [...prev, ...toAdd]);
+      }
     }
   };
 
@@ -148,6 +190,8 @@ export const CreateWorkflowDialog: React.FC<CreateWorkflowDialogProps> = ({
     setSelectedType('');
     setSelectedTemplate('');
     setStep('details');
+    setTags([]);
+    setTagInput('');
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -157,9 +201,35 @@ export const CreateWorkflowDialog: React.FC<CreateWorkflowDialogProps> = ({
     onOpenChange(newOpen);
   };
 
+  const addTag = (raw: string) => {
+    const value = raw.trim();
+    if (!value) return;
+    if (tags.includes(value)) return;
+    // optional: limit number of tags
+    if (tags.length >= 8) return;
+    setTags(prev => [...prev, value]);
+  };
+
+  const removeTag = (value: string) => {
+    setTags(prev => prev.filter(t => t !== value));
+  };
+
+  const onTagKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+    if (e.key === 'Enter' || e.key === ',' || e.key === 'Tab') {
+      e.preventDefault();
+      if (tagInput.trim()) {
+        addTag(tagInput);
+        setTagInput('');
+      }
+    } else if (e.key === 'Backspace' && !tagInput) {
+      // quick remove last
+      removeTag(tags[tags.length - 1]);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plus className="w-5 h-5" />
@@ -170,40 +240,40 @@ export const CreateWorkflowDialog: React.FC<CreateWorkflowDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Step Navigation */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                 step === 'details' 
                   ? 'bg-primary text-primary-foreground' 
                   : 'bg-muted text-muted-foreground'
               }`}>
                 1
               </div>
-              <span className={`text-sm ${step === 'details' ? 'text-foreground' : 'text-muted-foreground'}`}>
+              <span className={`text-xs ${step === 'details' ? 'text-foreground' : 'text-muted-foreground'}`}>
                 Basic Details
               </span>
             </div>
             <div className="flex-1 h-px bg-border" />
             <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                 step === 'template' 
                   ? 'bg-primary text-primary-foreground' 
                   : 'bg-muted text-muted-foreground'
               }`}>
                 2
               </div>
-              <span className={`text-sm ${step === 'template' ? 'text-foreground' : 'text-muted-foreground'}`}>
+              <span className={`text-xs ${step === 'template' ? 'text-foreground' : 'text-muted-foreground'}`}>
                 Choose Template
               </span>
             </div>
           </div>
 
           {step === 'details' ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Workflow Name</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Workflow Name</label>
                 <Input
                   placeholder="Enter workflow name..."
                   value={workflowName}
@@ -213,7 +283,7 @@ export const CreateWorkflowDialog: React.FC<CreateWorkflowDialogProps> = ({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Description</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Description</label>
                 <Textarea
                   placeholder="Describe what this workflow does..."
                   value={description}
@@ -224,7 +294,7 @@ export const CreateWorkflowDialog: React.FC<CreateWorkflowDialogProps> = ({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Workflow Type</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Workflow Type</label>
                 <Select value={selectedType} onValueChange={setSelectedType}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select workflow type" />
@@ -257,44 +327,104 @@ export const CreateWorkflowDialog: React.FC<CreateWorkflowDialogProps> = ({
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Tags</label>
+                <div className="flex flex-wrap items-center gap-1.5 rounded-md border border-input bg-background px-2 py-1.5">
+                  {tags.map((t) => (
+                    <Badge key={t} variant="secondary" className="px-2 py-0.5 text-xs flex items-center gap-1">
+                      <Tag className="w-3 h-3" />
+                      {t}
+                      <button
+                        type="button"
+                        className="ml-1 rounded hover:bg-muted/70"
+                        onClick={() => removeTag(t)}
+                        aria-label={`Remove tag ${t}`}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                  <input
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={onTagKeyDown}
+                    placeholder={tags.length ? 'Add tag' : 'Add tags (press Enter)'}
+                    className="flex-1 min-w-[120px] bg-transparent outline-none text-sm px-1 py-1"
+                  />
+                </div>
+                {filteredSuggestions.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {filteredSuggestions.map(s => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => addTag(s)}
+                        className="text-xs px-2 py-1 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 transition"
+                      >
+                        + {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto">
-                {workflowTemplates.map((template) => {
-                  const Icon = template.icon;
-                  return (
-                    <Card
-                      key={template.id}
-                      className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
-                        selectedTemplate === template.id
-                          ? 'ring-2 ring-primary border-primary'
-                          : 'hover:border-primary/50'
-                      }`}
-                      onClick={() => handleTemplateSelect(template.id)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                            <Icon className="w-5 h-5 text-primary" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-medium text-foreground">{template.name}</h4>
-                              {template.popular && (
-                                <Badge variant="secondary" className="text-xs">
-                                  <Star className="w-3 h-3 mr-1" />
-                                  Popular
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-muted-foreground">{template.description}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+            <div className="space-y-2">
+              <div className="max-h-80 overflow-y-auto rounded-md border border-border">
+                                 {/* Table Header */}
+                 <div className="sticky top-0 bg-background border-b border-border px-3 py-2">
+                   <div className="grid grid-cols-[auto_1fr] gap-3 text-xs font-medium text-muted-foreground">
+                     <div className="w-8"></div>
+                     <div>Template</div>
+                   </div>
+                 </div>
+                 
+                 {/* Table Rows */}
+                 <div className="divide-y divide-border">
+                   {workflowTemplates.map((template) => {
+                     const Icon = template.icon;
+                     const isSelected = selectedTemplate === template.id;
+                     return (
+                       <button
+                         type="button"
+                         key={template.id}
+                         onClick={() => handleTemplateSelect(template.id)}
+                         className={`w-full text-left focus:outline-none transition-colors ${
+                           isSelected ? 'bg-accent/60' : 'hover:bg-accent'
+                         }`}
+                       >
+                         <div className="grid grid-cols-[auto_1fr] gap-3 px-3 py-2.5 items-center">
+                           {/* Selection + Icon */}
+                           <div className="flex items-center gap-2">
+                             <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${
+                               isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40'
+                             }`}>
+                               {isSelected ? <Check className="w-3 h-3" /> : null}
+                             </div>
+                             <div className="w-6 h-6 bg-primary/10 rounded flex items-center justify-center">
+                               <Icon className="w-3 h-3 text-primary" />
+                             </div>
+                           </div>
+                           
+                           {/* Name + Description */}
+                           <div className="min-w-0">
+                             <div className="flex items-center gap-2">
+                               <h4 className="font-medium text-sm text-foreground truncate">{template.name}</h4>
+                               {template.popular && (
+                                 <Badge variant="secondary" className="text-[10px]">
+                                   <Star className="w-2 h-2 mr-1" />
+                                   Popular
+                                 </Badge>
+                               )}
+                             </div>
+                             <p className="text-xs text-muted-foreground truncate">{template.description}</p>
+                           </div>
+                         </div>
+                       </button>
+                     );
+                   })}
+                 </div>
               </div>
             </div>
           )}
